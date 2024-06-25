@@ -37,33 +37,3 @@ model ServiceProvider {
 
 
 
-
-
-BOOKING TABLE
-id
-Unique identifier for each booking
-service-provide-id
-Foreign key referencing the Service Providers table
-user-id
-Foreign key referencing the Users table
-service-type
-Type of service booked (e.g. braiding, weaving, coloring)
-date-time
-Date and time of the booking
-status
- Status of the booking (e.g. pending, confirmed, canceled)
-
-
-REVIEW TABLE
-id
-Unique identifier for each review
-service-provide-id
-Foreign key referencing the Service Providers table
-user-id
-Foreign key referencing the Users table
-rating
-Rating given by the user (1-5 stars)
-review-text
-Text of the review
-created-at
-Timestamp when the review was created

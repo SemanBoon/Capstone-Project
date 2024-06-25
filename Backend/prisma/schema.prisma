@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  phoneNumber Int
+  password String
+  name     String?
+  bookings Booking[]
+  profilePhoto String
+}
+
+model ServiceProvider {
+  id        Int      @id @default(autoincrement())
+  email String @unique
+  businessName     String
+  businessAddress    String
+  phoneNumber    Int
+  password String
+  services String
+  profilePhoto String
+}
+
+
+
+
+
+
+BOOKING TABLE
+id
+Unique identifier for each booking
+service-provide-id
+Foreign key referencing the Service Providers table
+user-id
+Foreign key referencing the Users table
+service-type
+Type of service booked (e.g. braiding, weaving, coloring)
+date-time
+Date and time of the booking
+status
+ Status of the booking (e.g. pending, confirmed, canceled)
+
+
+REVIEW TABLE
+id
+Unique identifier for each review
+service-provide-id
+Foreign key referencing the Service Providers table
+user-id
+Foreign key referencing the Users table
+rating
+Rating given by the user (1-5 stars)
+review-text
+Text of the review
+created-at
+Timestamp when the review was created

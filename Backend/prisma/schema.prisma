@@ -18,9 +18,10 @@ model User {
   email    String   @unique
   phoneNumber Int
   password String
-  name     String?
+  name     String
   bookings Booking[]
   profilePhoto String
+  userAddress String
 }
 
 model ServiceProvider {
@@ -28,12 +29,9 @@ model ServiceProvider {
   email String @unique
   businessName     String
   businessAddress    String
-  phoneNumber    Int
+  phoneNumber   Int
   password String
   services String
   profilePhoto String
+  coverPhoto String
 }
-
-
-
-

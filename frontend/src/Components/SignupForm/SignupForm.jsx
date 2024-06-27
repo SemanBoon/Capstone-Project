@@ -24,31 +24,33 @@ const SignupForm = () => {
     setUserName(e.target.value);
   };
 
+
   const handleSignup = () => {
-    fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
-    {
-      method: POST,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: userName,
-        Email: userEmail,
-        phoneNumber: userPhone,
-        password: userPassword,
-      }),
-    })
-    .then((response) => {
-      console.log(response);
-      if (response.ok) {
-        setResults("signup successful");
-      } else {
-        setResults("failed to sign-up");
-      }
-    })
-    .catch((error) => {
-      setResult("failed to sign-up");
-    });
+    console.log("sewa");
+    // fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
+    // {
+    //   method: 'POST',
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     name: userName,
+    //     Email: userEmail,
+    //     phoneNumber: userPhone,
+    //     password: userPassword,
+    //   }),
+    // })
+    // .then((response) => {
+    //   console.log(response);
+    //   if (response.ok) {
+    //     setResult("signup successful");
+    //   } else {
+    //     setResult("failed to sign-up");
+    //   }
+    // })
+    // .catch((error) => {
+    //   setResult("failed to sign-up");
+    // });
 
   };
 
@@ -64,6 +66,7 @@ const SignupForm = () => {
             placeholder="Enter Fullname"
             value={userName}
             onChange ={handleChangeUserName}
+            key="userName"
           />
           <br />
           <br />
@@ -75,6 +78,7 @@ const SignupForm = () => {
             placeholder="Enter Email Address"
             value={userEmail}
             onChange={handleChangeEmail}
+            key="userEmail"
           />
           <br />
           <br />
@@ -86,6 +90,7 @@ const SignupForm = () => {
             placeholder="Enter Phone Number"
             value={userPhone}
             onChange={handleChangePhone}
+            key="userPhone"
           />
           <br />
           <br />
@@ -97,17 +102,18 @@ const SignupForm = () => {
             placeholder="Enter Password"
             value={userPassword}
             onChange={handleChangePassword}
+            key="userPassword"
           />
           <br />
           <br />
-          <input className="signup-button" type="submit" value="Sign-Up" onClick={handleSignup} />
+          <button className="signup-button" onClick={handleSignup}> SignUp</button>
           <div className="not-new-user">
             Already have an account? <span>Log in!</span>
             {/* put a link in log in to take me to the login form */}
           </div>
         </form>
       </div>
-      {result && <p>{result}</p>}
+
     </>
   );
 };

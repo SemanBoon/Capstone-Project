@@ -18,8 +18,8 @@ model User {
   phoneNumber Int
   hashedPassword String
   name     String
-  profilePhoto String
-  userAddress String
+  profilePhoto String?
+  userAddress String?
 }
 
 model ServiceProvider {

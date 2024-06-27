@@ -14,23 +14,20 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
+  email    String   @id
   phoneNumber Int
-  password String
+  hashedPassword String
   name     String
-  bookings Booking[]
   profilePhoto String
   userAddress String
 }
 
 model ServiceProvider {
-  id        Int      @id @default(autoincrement())
-  email String @unique
+  email String @id
   businessName     String
   businessAddress    String
   phoneNumber   Int
-  password String
+  hashedPassword String
   services String
   profilePhoto String
   coverPhoto String

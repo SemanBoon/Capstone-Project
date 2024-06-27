@@ -24,8 +24,8 @@ app.post("/signup", async (req, res) => {
                 data:{
                     name,
                     email,
-                    phoneNumber,
-                    hashedPassword: hashed
+                    phoneNumber: parseInt(phoneNumber),
+                    hashedPassword: hashed,
                 }
             })
             res.status(200).json({});
@@ -33,9 +33,13 @@ app.post("/signup", async (req, res) => {
             res.status(500).json({"error": e.message});
         }
     })
-
-
 })
+
+
+
+app.get("/signup", async (req, res) =>
+    res.send ('It worked')
+  );
 
 // app.post("/login", async (req, res) => {
 

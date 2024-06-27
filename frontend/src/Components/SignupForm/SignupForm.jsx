@@ -27,37 +27,37 @@ const SignupForm = () => {
 
   const handleSignup = () => {
     console.log("sewa");
-    // fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
-    // {
-    //   method: 'POST',
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     name: userName,
-    //     Email: userEmail,
-    //     phoneNumber: userPhone,
-    //     password: userPassword,
-    //   }),
-    // })
-    // .then((response) => {
-    //   console.log(response);
-    //   if (response.ok) {
-    //     setResult("signup successful");
-    //   } else {
-    //     setResult("failed to sign-up");
-    //   }
-    // })
-    // .catch((error) => {
-    //   setResult("failed to sign-up");
-    // });
+    fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
+    {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: userName,
+        Email: userEmail,
+        phoneNumber: parseInt(userPhone),
+        password: userPassword,
+      }),
+    })
+    .then((response) => {
+      console.log(response);
+      if (response.ok) {
+        setResult("signup successful");
+      } else {
+        setResult("failed to sign-up");
+      }
+    })
+    .catch((error) => {
+      setResult("failed to sign-up");
+    });
 
   };
 
   return (
     <>
       <div className="container">
-        <form className="user-info">
+        <div className="user-info">
           <label htmlFor="userName">Name:</label>
           <input
             type="text"
@@ -111,7 +111,7 @@ const SignupForm = () => {
             Already have an account? <span>Log in!</span>
             {/* put a link in log in to take me to the login form */}
           </div>
-        </form>
+        </div>
       </div>
 
     </>

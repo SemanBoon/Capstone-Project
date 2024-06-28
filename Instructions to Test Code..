@@ -1,0 +1,20 @@
+FRONTEND:
+  - First Step: Clone the repository
+  - install npm
+  - install vite
+  - install react
+  - run: npm run dev in the frontend directory
+  - View your app by opening http://localhost:5173 in your browser.
+
+
+BACKEND
+  - First Step: Clone the Repository
+  - install node
+  - install express: npm install express
+  - install roc
+  - install prisma: npm install prisma --save-dev
+  -IF YOU HAVE ALL THESE FILES SET UP, JUST TYPE IN node index.js in the backend directory to run the backend
+
+TESTING
+  - Install insomnia and create an account with your personal email address to test the backend.
+

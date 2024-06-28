@@ -37,7 +37,7 @@ const SignupForm = () => {
       },
       body: JSON.stringify({
         name: userName,
-        Email: userEmail,
+        email: userEmail,
         phoneNumber: parseInt(userPhone),
         password: userPassword,
       }),
@@ -110,7 +110,6 @@ const SignupForm = () => {
           <button className="signup-button" onClick={handleSignup}> SignUp</button>
           <div className="not-new-user">
             Already have an account? <span><a href="/login">Log in</a></span>
-            {/* put a link in log in to take me to the login form */}
           </div>
         </div>
       </div>

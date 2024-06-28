@@ -1,25 +1,20 @@
 FRONTEND:
-To Create a React project template with Vite
-  -npm create vite@latest my-vite-app --template react
-  -Run npm create. Replace my-vite-app with an appropriate name for your application.
-  -When it prompts you to select a framework, choose React.
-  -When it prompts you to select a variant, choose JavaScript.
-
-Navigate into your directory with cd <your-app-name>.
-  -Install app dependencies with npm install
-  -Start the development server with npm run dev
-  -View your app by opening http://localhost:5173 in your browser.
+  - First Step: Clone the repository
+  - install npm
+  - install vite
+  - install react
+  - run: npm run dev in the frontend directory
+  - View your app by opening http://localhost:5173 in your browser.
 
 
 BACKEND
-  - Inside the project directory in your terminal, run the following command: npm init -y
-  This command creates a package.json file in your project directory with default values.
-  -Before you install Express, make sure your terminal is navigated to the root of your project directory. I
-    Type the following command in your terminal and press Enter: npm install express
+  - First Step: Clone the Repository
+  - install node
+  - install express: npm install express
+  - install roc
+  - install prisma: npm install prisma --save-dev
+  -IF YOU HAVE ALL THESE FILES SET UP, JUST TYPE IN node index.js in the backend directory to run the backend
 
-  PRISMA
-  - Open your project directory in your terminal. Run the following command to install Prisma CLI as a development dependency: npm install prisma --save-dev
-  - In your project directory, run: npx prisma init
-    This command creates a new prisma folder with a schema.prisma file, outlining your database schema, and a .env file for environment variables.
+TESTING
+  - Install insomnia and create an account with your personal email address to test the backend.
 
-IF YOU HAVE ALL THESE FILES SET UP, JUST TYPE IN node index.js to run the backend

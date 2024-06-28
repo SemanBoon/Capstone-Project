@@ -16,11 +16,12 @@ app.listen(PORT, () => {
 });
 
 app.post("/signup", async (req, res) => {
-    // fill this in
+    console.log("hurray");
     const {name, email, phoneNumber, password} = req.body;
+    console.log(name);
     bcrypt.hash(password, saltRounds, async function(err, hashed){
         try {
-            await prisma.user.create({
+            await prisma.User.create({
                 data:{
                     name,
                     email,
@@ -35,12 +36,24 @@ app.post("/signup", async (req, res) => {
     })
 })
 
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      const userRecord = await prisma.user.findUnique({ where: { email } });
+      if (!userRecord) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const isMatch = await bcrypt.compare(password, userRecord.hashedPassword);
+      if (isMatch) {
+        res.status(200).json({});
+      } else {
+        res.status(401).json({ error: "Invalid credentials" });
+      }
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+});
 
-
-app.get("/signup", async (req, res) =>
-    res.send ('It worked')
-  );
-
-// app.post("/login", async (req, res) => {
-
-// })
+app.get('/homepage', (req, res) => {
+    res.send("welcome to app")
+ })

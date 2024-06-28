@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SignupForm.css";
+import {useNavigate} from "react-router-dom"
 
 const SignupForm = () => {
   const [userName, setUserName] = useState("");
@@ -7,6 +8,7 @@ const SignupForm = () => {
   const [userPhone, setUserPhone] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [result, setResult] = useState("");
+  const navigate = useNavigate();
 
   const handleChangePassword = (e) => {
     setUserPassword(e.target.value);
@@ -41,15 +43,18 @@ const SignupForm = () => {
       }),
     })
     .then((response) => {
-      console.log(response);
       if (response.ok) {
         setResult("signup successful");
+        console.log('success')
+        navigate("/login")
       } else {
         setResult("failed to sign-up");
+        console.log('failed')
       }
     })
     .catch((error) => {
       setResult("failed to sign-up");
+      console.log('error')
     });
 
   };
@@ -66,7 +71,6 @@ const SignupForm = () => {
             placeholder="Enter Fullname"
             value={userName}
             onChange ={handleChangeUserName}
-            key="userName"
           />
           <br />
           <br />
@@ -78,7 +82,6 @@ const SignupForm = () => {
             placeholder="Enter Email Address"
             value={userEmail}
             onChange={handleChangeEmail}
-            key="userEmail"
           />
           <br />
           <br />
@@ -90,7 +93,6 @@ const SignupForm = () => {
             placeholder="Enter Phone Number"
             value={userPhone}
             onChange={handleChangePhone}
-            key="userPhone"
           />
           <br />
           <br />
@@ -102,13 +104,12 @@ const SignupForm = () => {
             placeholder="Enter Password"
             value={userPassword}
             onChange={handleChangePassword}
-            key="userPassword"
           />
           <br />
           <br />
           <button className="signup-button" onClick={handleSignup}> SignUp</button>
           <div className="not-new-user">
-            Already have an account? <span>Log in!</span>
+            Already have an account? <span><a href="/login">Log in</a></span>
             {/* put a link in log in to take me to the login form */}
           </div>
         </div>

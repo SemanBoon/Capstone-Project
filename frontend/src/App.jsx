@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { UserContext } from './UserContext';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
 import SignupForm from "./Components/SignupForm/SignupForm";
 import LoginForm from "./Components/LoginForm/LoginForm";
 import HomePage from "./Components/HomePage/HomePage";
+import "./App.css";
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -17,7 +17,11 @@ function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(user));
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
   }, [user]);
 
   return (

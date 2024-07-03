@@ -21,7 +21,6 @@ model User {
   name     String
   profilePhoto String?
   userAddress String?
-  refreshTokens RefreshToken[]
 }
 
 model ServiceProvider {
@@ -34,15 +33,4 @@ model ServiceProvider {
   services String
   profilePhoto String
   coverPhoto String
-  refreshTokens RefreshToken[]
 }
-
-model RefreshToken {
-  id       String   @id @default(cuid())
-  token     String
-  userId    String?
-  providerId String?
-  user      User?     @relation(fields: [userId], references: [id])
-  provider   ServiceProvider?     @relation(fields: [providerId], references: [id])
-}
-

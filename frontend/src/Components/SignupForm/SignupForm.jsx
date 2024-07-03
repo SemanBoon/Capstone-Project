@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
-import "./SignupForm.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
+import "./SignupForm.css";
 
 const capitalizedName = (name) => {
   return name
@@ -20,6 +20,7 @@ const SignupForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userPassword, setUserPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("")
   const navigate = useNavigate();
   const { updateUser } = useContext(UserContext);
 
@@ -44,16 +45,16 @@ const SignupForm = () => {
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(userEmail)) {
-      alert("Please enter a valid email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
     if (userPassword.length < 8) {
-      alert("Password must be at least 8 characters long.");
+      setErrorMessage("Password must be at least 8 characters long.");
       return;
     }
     const nameParts = userName.trim().split(" ");
     if (nameParts.length < 2) {
-      alert("Please enter your full name");
+      setErrorMessage("Please enter your full name");
       return;
     }
 
@@ -61,7 +62,7 @@ const SignupForm = () => {
     const formattedEmail = capitalizedEmail(userEmail);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
+      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
         {
           method: "POST",
           headers: {
@@ -75,41 +76,42 @@ const SignupForm = () => {
           }),
         }
       );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Signup success");
+      if (signupResponse.ok) {
         setUserName("");
         setUserEmail("");
         setUserPassword("");
         setUserPhone("");
+        console.log("Signup success");
 
         const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: formattedEmail,
-              password: userPassword,
-            }),
-          }
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formattedEmail,
+            password: userPassword,
+          }),
+        }
         );
 
         if (loginResponse.ok) {
           const loginData = await loginResponse.json();
-          localStorage.setItem("token", loginData.accessToken);
-          localStorage.setItem("refreshToken", loginData.refreshToken);
-          updateUser({ email: formattedEmail });
+          localStorage.setItem("user", JSON.stringify(loginData));
+          updateUser(loginData);
           navigate("/homepage");
         } else {
           console.log("Login failed");
+          setErrorMessage('Login Failed')
         }
       } else {
         console.log("Signup failed");
+        setErrorMessage('Signup Failed')
       }
     } catch (error) {
       console.log("error:", error);
+      setErrorMessage('An error occured, please try again')
     }
   };
 
@@ -161,7 +163,8 @@ const SignupForm = () => {
         />
         <br />
         <br />
-        <button className="signup-button" onClick={handleSignup}>SignUp</button>
+        <button className="signup-button" onClick={handleSignup}>Sign Up</button>
+        {errorMessage && <p style={{color: "red", fontSize: "13px"}}>{errorMessage}</p>}
         <div className="not-new-user">Already have an account?
           <span>
             <a href="/login">Log in</a>

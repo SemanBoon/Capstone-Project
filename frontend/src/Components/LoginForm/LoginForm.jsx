@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../../UserContext";
+import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
-import {useNavigate} from "react-router-dom"
 
 const LoginForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const [result, setResult] = useState("");
   const navigate = useNavigate();
+  const { updateUser } = useContext(UserContext);
 
   const handleChangePassword = (e) => {
     setUserPassword(e.target.value);
@@ -16,68 +17,63 @@ const LoginForm = () => {
     setUserEmail(e.target.value);
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userEmail, password: userPassword }),
+      });
 
-  const handleLogin = () => {
-    console.log("sewa");
-    fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: userEmail,
-        password: userPassword,
-      }),
-    })
-    .then((response) => {
-      console.log(response);
       if (response.ok) {
-        setResult("login successful");
-        navigate("/homepage")
-        console.log('success')
+        const data = await response.json();
+        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        updateUser({ email: userEmail });
+        navigate("/homepage");
       } else {
-        setResult("failed to login");
-        console.log('failed')
+        console.log("Login failed");
       }
-    })
-    .catch((error) => {
-      setResult("failed to login");
-      console.log('error')
-    });
-
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   return (
-    <>
-      <div className="container">
-        <div className="user-info">
-          <label htmlFor="userEmail">Email:</label>
-          <input
-            type="text"
-            id="userEmail"
-            name="userEmail"
-            placeholder="Enter Email Address"
-            value={userEmail}
-            onChange={handleChangeEmail}
-          />
-          <br />
-          <br />
-          <label htmlFor="userPassword">Password:</label>
-          <input
-            type="text"
-            id="userPassword"
-            name="userPassword"
-            placeholder="Enter Password"
-            value={userPassword}
-            onChange={handleChangePassword}
-          />
-          <br />
-          <br />
-          <button className="login-button" onClick={handleLogin}> Login</button>
+    <div className="container">
+      <div className="user-info">
+        <h2>Login</h2>
+        <label htmlFor="userEmail">Email:</label>
+        <input
+          type="email"
+          id="userEmail"
+          placeholder="Enter Email Address"
+          value={userEmail}
+          onChange={handleChangeEmail}
+          required
+        />
+        <br />
+        <br />
+        <label htmlFor="userPassword">Password:</label>
+        <input
+          type="password"
+          id="userPassword"
+          placeholder="Enter Password"
+          value={userPassword}
+          onChange={handleChangePassword}
+          required
+        />
+        <br />
+        <br />
+        <button className="login-button" onClick={handleLogin}>Login</button>
+        <div className="new-user">
+          New account? <span><a href="/signup">Sign Up</a></span>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

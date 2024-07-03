@@ -14,16 +14,19 @@ datasource db {
 }
 
 model User {
-  email    String   @id
+  id       String   @id @default(cuid())
+  email    String   @unique
   phoneNumber Int
   hashedPassword String
   name     String
   profilePhoto String?
   userAddress String?
+  refreshTokens RefreshToken[]
 }
 
 model ServiceProvider {
-  email String @id
+  id       String   @id @default(cuid())
+  email String @unique
   businessName     String
   businessAddress    String
   phoneNumber   Int
@@ -31,4 +34,15 @@ model ServiceProvider {
   services String
   profilePhoto String
   coverPhoto String
+  refreshTokens RefreshToken[]
 }
+
+model RefreshToken {
+  id       String   @id @default(cuid())
+  token     String
+  userId    String?
+  providerId String?
+  user      User?     @relation(fields: [userId], references: [id])
+  provider   ServiceProvider?     @relation(fields: [providerId], references: [id])
+}
+

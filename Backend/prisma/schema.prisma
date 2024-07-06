@@ -27,10 +27,10 @@ model ServiceProvider {
   id       String   @id @default(cuid())
   email String @unique
   businessName     String
-  businessAddress    String
+  businessAddress    String?
   phoneNumber   Int
   hashedPassword String
-  services String
-  profilePhoto String
-  coverPhoto String
+  services String?
+  profilePhoto String?
+  coverPhoto String?
 }

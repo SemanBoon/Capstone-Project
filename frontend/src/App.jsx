@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignupForm from "./Components/SignupForm/SignupForm";
 import LoginForm from "./Components/LoginForm/LoginForm";
 import HomePage from "./Components/HomePage/HomePage";
+import ServiceProviderSignupForm from "./Components/ServiceProviderSignupForm/ServiceProviderSignupForm";
+import SelectProfilePage from "./Components/SelectProfilePage/SelectProfilePage";
 import "./App.css";
 
 function App() {
@@ -27,13 +29,13 @@ function App() {
   return (
     <div className="app">
       <UserContext.Provider value={{ user, updateUser }}>
-        <Router>
+      <Router>
           <Routes>
-            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/" element={<SelectProfilePage />} />
+            <Route path="/user-signup" element={<SignupForm />} />
+            <Route path="/service-provider-signup" element={<ServiceProviderSignupForm />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/homepage" element={<HomePage />} />
-            <Route path="/" element={<SignupForm />} />
-            {/* <Route path="/" element={user ? <HomePage/> : <LoginForm /> } /> */}
           </Routes>
         </Router>
       </UserContext.Provider>

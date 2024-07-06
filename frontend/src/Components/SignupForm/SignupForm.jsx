@@ -62,7 +62,7 @@ const SignupForm = () => {
     const formattedEmail = capitalizedEmail(userEmail);
 
     try {
-      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/signup`,
+      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/user-signup`,
         {
           method: "POST",
           headers: {

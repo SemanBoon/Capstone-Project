@@ -1,0 +1,18 @@
+.profile-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.profile-selection-container h2 {
+  margin-bottom: 20px;
+}
+
+.profile-selection-container button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}

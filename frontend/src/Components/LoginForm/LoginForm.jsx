@@ -1,15 +1,17 @@
 import React, { useState, useContext, useReducer } from "react";
 import { UserContext } from "../../UserContext";
 import { useNavigate } from "react-router-dom";
+import SelectProfileModal from "../SelectProfileModal/SelectProfileModal";
 import "./LoginForm.css";
 
 
 const LoginForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const navigate = useNavigate();
   const { updateUser } = useContext(UserContext);
+  const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("")
+  const navigate = useNavigate();
 
   const handleChangePassword = (e) => {
     setUserPassword(e.target.value);
@@ -76,6 +78,24 @@ const LoginForm = () => {
     }
   };
 
+  const handleSignupClick = () => {
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
+  const handleSelection = (type) => {
+    setShowModal(false);
+    if (type === 'user') {
+      navigate('/user-signup');
+    } else if (type === 'serviceProvider') {
+      navigate('/service-provider-signup');
+    }
+  };
+
+
   return (
     <div className="container">
       <div className="user-info">
@@ -105,10 +125,11 @@ const LoginForm = () => {
         <br />
         <button className="login-button" onClick={handleLogin}>Login</button>
         <div className="new-user">
-          New account? <a href="/signup">Sign Up</a>
+          New account? <span onClick={handleSignupClick}>Sign Up</span>
         </div>
-      </div>
-    </div>
+        </div>
+          <SelectProfileModal show={showModal} handleClose={handleModalClose} handleSelection={handleSelection} />
+        </div>
   );
 };
 

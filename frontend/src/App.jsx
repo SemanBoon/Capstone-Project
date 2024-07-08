@@ -6,7 +6,10 @@ import LoginForm from "./Components/LoginForm/LoginForm";
 import HomePage from "./Components/HomePage/HomePage";
 import ServiceProviderSignupForm from "./Components/ServiceProviderSignupForm/ServiceProviderSignupForm";
 import SelectProfilePage from "./Components/SelectProfilePage/SelectProfilePage";
+import UserProfilePage from "./Components/UserProfilePage/UserProfilePage";
+import UserFavPage from "./Components/UserFavPage/UserFavPage";
 import "./App.css";
+
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -36,6 +39,8 @@ function App() {
             <Route path="/service-provider-signup" element={<ServiceProviderSignupForm />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/homepage" element={<HomePage />} />
+            <Route path="/user-profile" element={<UserProfilePage />} />
+            <Route path="favorite" element={<UserFavPage/>} />
           </Routes>
         </Router>
       </UserContext.Provider>

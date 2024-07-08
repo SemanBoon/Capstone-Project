@@ -32,13 +32,6 @@ app.get("/homepage", (req, res) => {
   res.send(`Welcome to the app`)
 });
 
-// app.get("/service-provider-signup/:KBid", async (req, res) => {
-//   const { KBid } = req.params;
-//   const cards = await prisma.KudosCard.findMany({
-//     where: { KBid: parseInt(KBid) },
-//   });
-//   res.status(200).json(cards);
-// });
 
 app.post("/user-signup", async (req, res) => {
   const { name, email, phoneNumber, password } = req.body;
@@ -50,6 +43,7 @@ app.post("/user-signup", async (req, res) => {
         email,
         phoneNumber: parseInt(phoneNumber),
         hashedPassword,
+        userType: "user",
       },
     });
     res.status(200).json(newUser);
@@ -69,6 +63,7 @@ app.post("/service-provider-signup", async (req, res) => {
         email,
         phoneNumber: parseInt(phoneNumber),
         hashedPassword,
+        userType: "service-provider"
       },
     });
     res.status(200).json(newServiceProvider);
@@ -80,63 +75,35 @@ app.post("/service-provider-signup", async (req, res) => {
 
 
 app.post("/login", async (req, res) => {
-  const { email, password, userType } = req.body;
+  const { email, password} = req.body;
   try {
     let userRecord;
-    if (userType === "user") {
-      userRecord = await prisma.user.findUnique({ where: { email } });
-    } else if (userType === "serviceProvider") {
-      userRecord = await prisma.serviceProvider.findUnique({ where: { email } });
-    } else {
-      return res.status(400).json({ error: "Invalid user type" });
+
+    userRecord = await prisma.user.findUnique({ where: { email } });
+    if (userRecord) {
+      const isMatch = await bcrypt.compare(password, userRecord.hashedPassword);
+      if (isMatch) {
+        userRecord.userType = "user";
+        return res.status(200).json(userRecord);
+      } else {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
     }
 
-    if (!userRecord) {
-      return res.status(404).json({ error: "User not found" });
+    userRecord = await prisma.serviceProvider.findUnique({ where: { email } });
+    if (userRecord) {
+      const isMatch = await bcrypt.compare(password, userRecord.hashedPassword);
+      if (isMatch) {
+        userRecord.userType = "service-provider";
+        return res.status(200).json(userRecord);
+      } else {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
     }
+    return res.status(404).json({ error: "User not found" });
 
-    const isMatch = await bcrypt.compare(password, userRecord.hashedPassword);
-    if (isMatch) {
-      return res.status(200).json(userRecord);
-    } else {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
   } catch (e) {
     console.log(e.message)
     res.status(500).json({ error: e.message });
   }
 });
-
-// app.post("/login", async (req, res) => {
-//   const { email, password} = req.body;
-//   try {
-//     const userRecord = await prisma.user.findUnique({ where: { email } });
-//     if (!userRecord) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-//     if (userRecord) {
-//       const isMatch = await bcrypt.compare(password, userRecord.hashedPassword);
-//       if (isMatch) {
-//         return res.status(200).json(userRecord);
-//       } else {
-//         return res.status(401).json({ error: "Invalid credentials" });
-//       }
-//     }
-
-//     const serviceProviderRecord = await prisma.serviceProvider.findUnique({ where: { email } });
-//     if (!serviceProviderRecord) {
-//       return res.status(404).json({ error: "Service Provider not found" });
-//     }
-//     if (serviceProviderRecord) {
-//       const isMatch = await bcrypt.compare(password, serviceProviderRecord.hashedPassword);
-//       if (isMatch) {
-//         res.status(200).json(serviceProviderRecord);
-//       } else {
-//         res.status(401).json({ error: "Invalid credentials" });
-//       }
-//     }
-//   } catch (e) {
-//     console.log(e.message)
-//     res.status(500).json({ error: e.message });
-//   }
-// });

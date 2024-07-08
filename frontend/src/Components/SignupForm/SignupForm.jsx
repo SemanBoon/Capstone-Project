@@ -74,7 +74,7 @@ const SignupForm = () => {
             email: formattedEmail,
             phoneNumber: parseInt(userPhone),
             password: userPassword,
-            // userType: "user"
+            userType: "user",
           }),
         }
       );
@@ -94,7 +94,6 @@ const SignupForm = () => {
           body: JSON.stringify({
             email: formattedEmail,
             password: userPassword,
-            userType: "user"
           }),
         }
         );

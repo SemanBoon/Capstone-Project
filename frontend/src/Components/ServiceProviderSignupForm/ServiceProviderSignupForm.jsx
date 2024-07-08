@@ -70,7 +70,7 @@ const ServiceProviderSignupForm = () => {
             email: formattedEmail,
             phoneNumber: parseInt(phoneNumber),
             password: password,
-            // userType: "serviceProvider"
+            userType:"service-provider"
           }),
         }
       );
@@ -89,7 +89,7 @@ const ServiceProviderSignupForm = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email: formattedName, password: password, userType: "serviceProvider" }),
+            body: JSON.stringify({ email: formattedEmail, password}),
           }
         );
 

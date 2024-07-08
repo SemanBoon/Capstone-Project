@@ -3,6 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import "./ServiceProviderSignupForm.css";
 
+const capitalizedName = (providerName) => {
+  return providerName
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+const capitalizedEmail = (providerEmail) => {
+  return providerEmail.charAt(0).toUpperCase() + providerEmail.slice(1).toLowerCase();
+};
+
 const ServiceProviderSignupForm = () => {
   const [businessName, setBusinessName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,35 +54,44 @@ const ServiceProviderSignupForm = () => {
       return;
     }
 
+    const formattedName = capitalizedName(businessName);
+    const formattedEmail = capitalizedEmail(email);
+
     try {
-      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          businessName,
-          email,
-          phoneNumber: parseInt(phoneNumber),
-          password,
-        }),
-      });
+      const signupResponse = await fetch(
+        `${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            businessName: formattedName,
+            email: formattedEmail,
+            phoneNumber: parseInt(phoneNumber),
+            password: password,
+            // userType: "serviceProvider"
+          }),
+        }
+      );
 
       if (signupResponse.ok) {
-        const data = await signupResponse.json();
         setBusinessName("");
         setEmail("");
         setPassword("");
         setPhoneNumber("");
         console.log("Signup success");
 
-        const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
+        const loginResponse = await fetch(
+          `${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: formattedName, password: password, userType: "serviceProvider" }),
+          }
+        );
 
         if (loginResponse.ok) {
           const loginData = await loginResponse.json();
@@ -79,15 +100,15 @@ const ServiceProviderSignupForm = () => {
           navigate("/homepage");
         } else {
           console.log("Login failed");
-          setErrorMessage('Login Failed');
+          setErrorMessage("Login Failed");
         }
       } else {
         console.log("Signup failed");
-        setErrorMessage('Signup Failed');
+        setErrorMessage("Signup Failed");
       }
     } catch (error) {
       console.log("error:", error);
-      setErrorMessage('An error occurred, please try again');
+      setErrorMessage("An error occurred, please try again");
     }
   };
 
@@ -95,7 +116,6 @@ const ServiceProviderSignupForm = () => {
     <div className="container">
       <div className="user-info">
         <h2>Service Provider Sign Up</h2>
-        {errorMessage && <p style={{color: "red", fontSize: "13px"}}>{errorMessage}</p>}
         <label htmlFor="businessName">Business Name:</label>
         <input
           type="text"
@@ -141,8 +161,11 @@ const ServiceProviderSignupForm = () => {
         <br />
         <br />
         <button className="signup-button" onClick={handleSignup}>Sign Up</button>
-        <div className="not-new-user">
-          Already have an account? <span><a href="/login">Log in</a></span>
+        {errorMessage && (<p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>)}
+        <div className="not-new-user">Already have an account?
+          <span>
+            <a href="/login">Log in</a>
+          </span>
         </div>
       </div>
     </div>

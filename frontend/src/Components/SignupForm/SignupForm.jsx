@@ -15,14 +15,15 @@ const capitalizedEmail = (email) => {
   return email.charAt(0).toUpperCase() + email.slice(1).toLowerCase();
 };
 
+
 const SignupForm = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("")
-  const navigate = useNavigate();
   const { updateUser } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const handleChangePassword = (e) => {
     setUserPassword(e.target.value);
@@ -73,6 +74,7 @@ const SignupForm = () => {
             email: formattedEmail,
             phoneNumber: parseInt(userPhone),
             password: userPassword,
+            // userType: "user"
           }),
         }
       );
@@ -92,6 +94,7 @@ const SignupForm = () => {
           body: JSON.stringify({
             email: formattedEmail,
             password: userPassword,
+            userType: "user"
           }),
         }
         );

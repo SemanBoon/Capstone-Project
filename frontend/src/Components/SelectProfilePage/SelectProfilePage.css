@@ -7,12 +7,25 @@
 }
 
 .profile-selection-container h2 {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  text-decoration: underline;
 }
 
-.profile-selection-container button {
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
+.profile-selection-container h1 {
+  margin-bottom: 10px;
+}
+
+.user-selection,
+.provider-selction{
+  margin-bottom: 40px;
+  width: 200px;
+  padding: 20px 20px;
   cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  background-color: #ff8400;
+
 }

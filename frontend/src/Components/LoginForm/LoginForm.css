@@ -3,18 +3,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-}
-
-.user-info {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-h2 {
-  margin-bottom: 20px;
+  flex-direction: column;
 }
 
 label {
@@ -26,37 +15,53 @@ label {
 input {
   width: 100%;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #ffc107; 
+body {
+  background-color: #f7f7f7;
+}
+
+.login-info {
+  background-color: lightgray;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.login-button {
+  background-color: #ff8400;
+  color: #fff;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 16px;
+  border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
-button:hover {
-  background-color: #e0a800;
+.login-button:hover {
+  background-color: #ff9900;
 }
 
 .new-user {
-  margin-top: 20px;
-  text-align: center;
-}
-
-a {
-  color: #ffc107;
   text-decoration: none;
+  margin-top: 0px;
+  color: #a64913;
 }
 
-a:hover {
+.new-user:hover {
+  cursor: pointer;
   text-decoration: underline;
 }

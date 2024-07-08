@@ -15,9 +15,10 @@ const SelectProfilePage = () => {
 
   return (
     <div className="profile-selection-container">
-      <h2>Select Profile Type</h2>
-      <button onClick={() => handleSelection('user')}>User Profile</button>
-      <button onClick={() => handleSelection('serviceProvider')}>Service Provider Profile</button>
+        <h1>Welcome to SheBraids</h1>
+        <h2>Select Profile Type</h2>
+        <button className="user-selection" onClick={() => handleSelection('user')}>User Profile</button>
+        <button className="provider-selction" onClick={() => handleSelection('serviceProvider')}>Service Provider Profile</button>
     </div>
   );
 };

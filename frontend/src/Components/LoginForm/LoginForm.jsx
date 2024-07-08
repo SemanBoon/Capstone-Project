@@ -61,7 +61,10 @@ const LoginForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: userEmail, password: userPassword }),
+        body: JSON.stringify({
+          email: userEmail,
+          password: userPassword,
+          userType: showModal ? "serviceProvider" : "user" }),
       });
 
       if (response.ok) {
@@ -98,7 +101,7 @@ const LoginForm = () => {
 
   return (
     <div className="container">
-      <div className="user-info">
+      <div className="login-info">
         <h2>Login</h2>
         <label htmlFor="userEmail">Email:</label>
         <input
@@ -124,8 +127,8 @@ const LoginForm = () => {
         <br />
         <br />
         <button className="login-button" onClick={handleLogin}>Login</button>
-        <div className="new-user">
-          New account? <span onClick={handleSignupClick}>Sign Up</span>
+        <div> New account?
+          <span className="new-user" onClick={handleSignupClick}>Sign Up</span>
         </div>
         </div>
           <SelectProfileModal show={showModal} handleClose={handleModalClose} handleSelection={handleSelection} />

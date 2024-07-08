@@ -64,7 +64,8 @@ const LoginForm = () => {
         body: JSON.stringify({
           email: userEmail,
           password: userPassword,
-          userType: showModal ? "serviceProvider" : "user" }),
+          // userType: showModal ? "serviceProvider" : "user"
+        }),
       });
 
       if (response.ok) {
@@ -93,7 +94,7 @@ const LoginForm = () => {
     setShowModal(false);
     if (type === 'user') {
       navigate('/user-signup');
-    } else if (type === 'serviceProvider') {
+    } else if (type === 'service-provider') {
       navigate('/service-provider-signup');
     }
   };
@@ -130,9 +131,9 @@ const LoginForm = () => {
         <div> New account?
           <span className="new-user" onClick={handleSignupClick}>Sign Up</span>
         </div>
-        </div>
+      </div>
           <SelectProfileModal show={showModal} handleClose={handleModalClose} handleSelection={handleSelection} />
-        </div>
+    </div>
   );
 };
 

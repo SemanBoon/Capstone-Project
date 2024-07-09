@@ -64,7 +64,6 @@ const LoginForm = () => {
         body: JSON.stringify({
           email: userEmail,
           password: userPassword,
-          // userType: showModal ? "serviceProvider" : "user"
         }),
       });
 

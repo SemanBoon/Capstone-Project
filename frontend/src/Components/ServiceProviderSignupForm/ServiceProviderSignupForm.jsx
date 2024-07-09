@@ -80,7 +80,6 @@ const ServiceProviderSignupForm = () => {
         setEmail("");
         setPassword("");
         setPhoneNumber("");
-        console.log("Signup success");
 
         const loginResponse = await fetch(
           `${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
@@ -99,11 +98,9 @@ const ServiceProviderSignupForm = () => {
           updateUser(loginData);
           navigate("/homepage");
         } else {
-          console.log("Login failed");
           setErrorMessage("Login Failed");
         }
       } else {
-        console.log("Signup failed");
         setErrorMessage("Signup Failed");
       }
     } catch (error) {

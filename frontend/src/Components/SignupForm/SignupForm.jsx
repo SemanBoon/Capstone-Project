@@ -83,7 +83,6 @@ const SignupForm = () => {
         setUserEmail("");
         setUserPassword("");
         setUserPhone("");
-        console.log("Signup success");
 
         const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
         {
@@ -104,11 +103,9 @@ const SignupForm = () => {
           updateUser(loginData);
           navigate("/homepage");
         } else {
-          console.log("Login failed");
           setErrorMessage('Login Failed')
         }
       } else {
-        console.log("Signup failed");
         setErrorMessage('Signup Failed')
       }
     } catch (error) {

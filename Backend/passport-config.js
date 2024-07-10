@@ -1,6 +1,8 @@
+//IMPORTANT BASE CODE FOR JWT TOKENS(STRETCH FEATURE)
+
 // const passport = require('passport');
 // const LocalStrategy = require('passport-local').Strategy;
-// // const User = require('./model/User');
+// const User = require('./model/User');
 // const bcrypt = require('bcrypt')
 
 // function initialize(passport) {

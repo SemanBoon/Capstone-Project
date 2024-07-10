@@ -1,0 +1,39 @@
+.idpc_autocomplete {
+  width: 100%;
+  max-width: 400px;
+  background-color: #b3e5fc;
+  border: 1px solid #81d4fa;
+}
+
+.idpc_ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #ffccbc;
+  border: 1px solid #ffab91;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.idpc_error {
+  color: #ffffff;
+  background-color: #f44336;
+  padding: 8px;
+  border-bottom: 1px solid #d32f2f;
+}
+
+.idpc_toolbar {
+  background-color: #64b5f6;
+  color: #fff176;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #42a5f5;
+}
+
+.idpc_country {
+  background-color: #ffb74d;
+  color: #6a1b9a;
+  display: inline-block;
+  margin: 5px 0;
+  border-radius: 4px;
+  font-weight: bold;
+}

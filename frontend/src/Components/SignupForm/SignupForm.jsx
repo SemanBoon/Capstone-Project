@@ -58,6 +58,11 @@ const SignupForm = () => {
       setErrorMessage("Please enter your full name");
       return;
     }
+    const phonePattern = /^\d{10}$|^\d{3}-\d{3}-\d{4}$/;
+    if (!phonePattern.test(userPhone)) {
+        setErrorMessage("Please enter a valid phone number.");
+        return;
+    }
 
     const formattedName = capitalizedName(userName);
     const formattedEmail = capitalizedEmail(userEmail);
@@ -72,7 +77,7 @@ const SignupForm = () => {
           body: JSON.stringify({
             name: formattedName,
             email: formattedEmail,
-            phoneNumber: parseInt(userPhone),
+            phoneNumber: userPhone,
             password: userPassword,
             userType: "user",
           }),
@@ -106,10 +111,14 @@ const SignupForm = () => {
           setErrorMessage('Login Failed')
         }
       } else {
-        setErrorMessage('Signup Failed')
+        const errorData = await signupResponse.json();
+        if (errorData.error === "Email already in use"){
+            setErrorMessage("Email already in use")
+        } else {
+            setErrorMessage("Signup Failed");
+        }
       }
     } catch (error) {
-      console.log("error:", error);
       setErrorMessage('An error occured, please try again')
     }
   };

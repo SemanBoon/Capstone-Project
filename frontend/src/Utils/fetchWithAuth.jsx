@@ -1,3 +1,5 @@
+//IMPORTANT BASE CODE FOR JWT TOKEN (STRETCH FEATURE)
+
 // const fetchWithAuth = async (url, options = {}) => {
 //     const accessToken = localStorage.getItem("access_token");
 //     const refreshToken = localStorage.getItem("refreshToken");

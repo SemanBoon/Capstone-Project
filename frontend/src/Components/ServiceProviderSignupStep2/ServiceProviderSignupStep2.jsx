@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import "./ServiceProviderSignupStep2.css";
@@ -15,6 +16,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
   const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
     const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
@@ -26,10 +28,38 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "businessAddress") {
+      getSuggestions(value);
+    }
   };
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, profilePhoto: e.target.files[0] });
+  };
+
+  const getSuggestions = async (query) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const response = await axios.get("http://api.geonames.org/searchJSON", {
+        params: {
+          q: query,
+          maxRows: 8,
+          username: "SewaBenson",
+        },
+      });
+      setSuggestions(response.data.geonames);
+    } catch (error) {
+      console.error("Error fetching address suggestions:", error);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setFormData({ ...formData, businessAddress: suggestion });
+    setSuggestions([]);
   };
 
   const handleBack = () => {
@@ -118,6 +148,15 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
+        {suggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {suggestions.map((suggestion) => (
+              <li key={suggestion.geonameId} onClick={() => handleSuggestionClick(suggestion.name)}>
+                {suggestion.name}, {suggestion.adminName1}, {suggestion.countryName}
+              </li>
+            ))}
+          </ul>
+        )}
         <br />
         <br />
         <label htmlFor="priceRange">Price Range:</label>
@@ -152,10 +191,10 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           required
         >
           <option value="">Select a Service</option>
-          <option value="braids">Braids</option>
-          <option value="haircuts">Haircuts</option>
-          <option value="weave and installs">Weave and Installs</option>
-          <option value="locs">Locs</option>
+          <option value="Braids">Braids</option>
+          <option value="Haircuts">Haircuts</option>
+          <option value="Weave and Installs">Weave and Installs</option>
+          <option value="Locs">Locs</option>
         </select>
         <br />
         <br />

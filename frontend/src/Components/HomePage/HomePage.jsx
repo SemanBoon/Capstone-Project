@@ -5,13 +5,17 @@ import NavBar from "../NavBar/NavBar";
 import "./HomePage.css";
 
 const HomePage = () => {
-  const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { user, updateUser } = useContext(UserContext);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     updateUser(null);
     navigate("/login");
+  };
+
+  const handleCategoryClick = (category) => {
+    navigate(`/search/${category}`, { state: { category, userAddress: user.userAddress } });
   };
 
   return (
@@ -21,10 +25,10 @@ const HomePage = () => {
       <h3>Find Your Perfect Match</h3>
     </div>
     <div className = "container">
-      <div className = "category">BRAIDS</div>
-      <div className = "category">WEAVE/INSTALLS</div>
-      <div className = "category">HAIR CUTS</div>
-      <div className = "category">LOCS</div>
+        <div className="braid-section"onClick={() => handleCategoryClick('Braids')}>BRAIDS</div>
+        <div className="haircut-section"onClick={() => handleCategoryClick('Haircuts')}>HAIRCUTS</div>
+        <div className="weave-section"onClick={() => handleCategoryClick('Weave and Installs')}>WEAVE AND INSTALLS</div>
+        <div className="locs-section"onClick={() => handleCategoryClick('Locs')}>LOCS</div>
     </div>
     <NavBar/>
     <button onClick={handleLogout} className="logout-button">Log Out</button>

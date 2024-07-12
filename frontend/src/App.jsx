@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignupForm from "./Components/SignupForm/SignupForm";
 import LoginForm from "./Components/LoginForm/LoginForm";
 import HomePage from "./Components/HomePage/HomePage";
+import SearchPage from "./Components/SearchPage/SearchPage";
 import ServiceProviderSignupForm from "./Components/ServiceProviderSignupForm/ServiceProviderSignupForm";
 import SelectProfilePage from "./Components/SelectProfilePage/SelectProfilePage";
 import UserProfilePage from "./Components/UserProfilePage/UserProfilePage";
@@ -41,6 +42,7 @@ function App() {
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/user-profile" element={<UserProfilePage />} />
             <Route path="favorite" element={<UserFavPage/>} />
+            <Route path="/search/:category" element={<SearchPage />} />
           </Routes>
         </Router>
       </UserContext.Provider>

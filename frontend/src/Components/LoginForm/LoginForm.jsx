@@ -76,7 +76,6 @@ const LoginForm = () => {
         setErrorMessage("Invalid email or password, please try again.")
       }
     } catch (error) {
-      console.log("error", error);
       setErrorMessage("An error occured, please try again later.")
     }
   };

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-const AddressLookupComponent = ({ onSelect }) => {
+const UserAddressLookup = ({ onSelect }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [query, setQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -60,4 +60,4 @@ const AddressLookupComponent = ({ onSelect }) => {
   );
 };
 
-export default AddressLookupComponent;
+export default UserAddressLookup;

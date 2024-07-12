@@ -1,9 +1,6 @@
 .homepage-header {
-  background-color: #f5f5f5;
-  padding: 20px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
+  padding: 20px;
 }
 
 .homepage-header h1 {
@@ -20,41 +17,65 @@
 
 .container {
   display: flex;
+  justify-content: space-around;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
   margin-top: 20px;
 }
 
-.category {
-  width: 200px;
-  height: 200px;
-  margin: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ff8400;
-}
-
-.category:hover {
+.braid-section {
   background-color: #f5f5f5;
-}
-
-.logout-button {
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  margin: 10px;
   cursor: pointer;
-  width: 20%;
+  transition: background-color 0.3s ease;
 }
 
-.logout-button:hover {
-  background-color: #444;
+.weave-section {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+.haircut-section {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.locs-section {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.braid-section:hover {
+  background-color: #e0e0e0;
+}
+.weave-section:hover {
+  background-color: #e0e0e0;
+}
+.haircut-section:hover {
+  background-color: #e0e0e0;
+}
+.locs-section:hover {
+  background-color: #e0e0e0;
+}
+

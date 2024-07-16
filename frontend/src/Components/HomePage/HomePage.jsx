@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import NavBar from "../NavBar/NavBar";
@@ -7,6 +7,7 @@ import "./HomePage.css";
 const HomePage = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useContext(UserContext);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -15,7 +16,11 @@ const HomePage = () => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate(`/search/${category}`, { state: { category, userAddress: user.userAddress } });
+    if (user && user.userAddress) {
+      navigate(`/search/${category}`, { state: { category, userAddress: user.userAddress } });
+    } else {
+      setErrorMessage("User address not available. Please update your profile with a valid address.");
+    }
   };
 
   return (
@@ -30,6 +35,7 @@ const HomePage = () => {
         <div className="weave-section"onClick={() => handleCategoryClick('Weave and Installs')}>WEAVE AND INSTALLS</div>
         <div className="locs-section"onClick={() => handleCategoryClick('Locs')}>LOCS</div>
     </div>
+    {errorMessage && <p className="error-message">{errorMessage}</p>}
     <NavBar/>
     <button onClick={handleLogout} className="logout-button">Log Out</button>
     </>

@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@arcgis/core": "^4.30.8",
+    "@arcgis/map-components": "^4.30.5",
+    "@arcgis/map-components-react": "^4.30.5",
     "axios": "^1.7.2",
     "esri-loader": "^3.7.0",
     "places.js": "^1.19.0",

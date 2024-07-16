@@ -6,7 +6,6 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
 const saltRounds = 14;
-const geolib = require('geolib');
 require("dotenv").config();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -15,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5174;
+
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
@@ -122,59 +122,55 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get('/service-providers', async (req, res) => {
-  const { category, location } = req.query;
+async function getGeocode(address) {
+  try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+      if (data.length === 0) {
+        throw new Error('Invalid address');
+      }
+      const location = {
+          x: parseFloat(data[0].lon),
+          y: parseFloat(data[0].lat)
+      };
+      return location;
+  } catch (error) {
+    throw new Error('Error fetching geocode');
+  }
+}
+
+app.post('/api/search', async (req, res) => {
+  const { address, category } = req.body;
 
   try {
+      const userLocation = await getGeocode(address);
 
-    if (!process.env.ARCGIS_API_KEY) {
-      return res.status(500).json({error: "Invalid API"})
-    }
+      const serviceProviders = await prisma.serviceProvider.findMany({
+          where: {
+              services: {
+                  contains: category.toLowerCase(),
+              },
+          },
+      });
 
-    const geocodeResponse = await fetch(`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(location)}&f=json&token=${process.env.ARCGIS_API_KEY}`)
-    const geocodeData = await geocodeResponse.json();
+      const results = await Promise.all(serviceProviders.map(async (provider) => {
+          try {
+              const providerLocation = await getGeocode(provider.businessAddress);
+              const distance = Math.sqrt(
+                  Math.pow(userLocation.x - providerLocation.x, 2) +
+                  Math.pow(userLocation.y - providerLocation.y, 2)
+              );
+              return { ...provider, distance };
+          } catch (err) {
+            return null;
+          }
+      }));
 
-    if (!geocodeData.candidates || geocodeData.candidates.length === 0) {
-      return res.status(400).json({ error: 'Invalid location' });
-    }
+      const validResults = results.filter(result => result !== null);
+      validResults.sort((a, b) => a.distance - b.distance);
 
-    const userCoords = {
-      latitude: geocodeData.candidates[0].location.y,
-      longitude: geocodeData.candidates[0].location.x,
-    };
-
-    const serviceProviders = await prisma.serviceProvider.findMany({
-      where: {
-        services: {
-          contains: category
-        }
-      }
-    });
-
-    const providersWithDistances = await Promise.all(
-      serviceProviders.map(async (provider) => {
-        const providerGeocodeResponse = await fetch(`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(provider.businessAddress)}&f=json&token=${process.env.ARCGIS_API_KEY}`)
-        const providerGeocodeData = await providerGeocodeResponse.json();
-
-        if (!providerGeocodeData.candidates || providerGeocodeData.candidates.length === 0) {
-          return provider;
-        }
-
-        const providerCoords = {
-          latitude: providerGeocodeData.candidates[0].location.y,
-          longitude: providerGeocodeData.candidates[0].location.x,
-        };
-
-        const distance = geolib.getDistance(userCoords, providerCoords);
-        return { ...provider, distance };
-      })
-    );
-
-    providersWithDistances.sort((a, b) => a.distance - b.distance);
-
-    res.json(providersWithDistances);
+      res.json(validResults);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error fetching service providers' });
+    res.status(500).json({ error: error.message });
   }
 });

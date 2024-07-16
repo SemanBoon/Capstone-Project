@@ -16,12 +16,17 @@ const SearchPage = () => {
 
   const fetchServiceProviders = async (loc) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/service-providers?category=${encodeURIComponent(category)}&location=${encodeURIComponent(loc)}`);
-        const data = await response.json();
-        setServiceProviders(Array.isArray(data) ? data : []);
+      const response = await fetch('http://localhost:5174/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address: loc, category }),
+      });
+      const data = await response.json();
+      setServiceProviders(Array.isArray(data) ? data : []);
     } catch (error) {
       setErrorMessage('Error fetching service providers');
-      console.error(error);
     }
   };
 

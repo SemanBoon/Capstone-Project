@@ -5,10 +5,11 @@ const SearchPage = () => {
   const { category } = useParams();
   const locationState = useLocation();
   const userAddress = locationState?.state?.userAddress || '';
-  const [location, setLocation] = useState(userAddress);
+  const [location, setLocation] = useState('');
   const navigate = useNavigate();
   const [serviceProviders, setServiceProviders] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     fetchServiceProviders(userAddress);
@@ -25,6 +26,7 @@ const SearchPage = () => {
       });
       const data = await response.json();
       setServiceProviders(Array.isArray(data) ? data : []);
+      setHasSearched(true);
     } catch (error) {
       setErrorMessage('Error fetching service providers');
     }
@@ -43,7 +45,8 @@ const SearchPage = () => {
   };
 
   const handleClear = () => {
-    setLocation(userAddress);
+    setLocation('');
+    setHasSearched(false);
     fetchServiceProviders(userAddress);
   };
 
@@ -56,29 +59,29 @@ const SearchPage = () => {
         <h2>Search {category}</h2>
         <div>
             <input
-                type="text"
-                value={location}
-                onChange={handleLocationChange}
-                placeholder="Enter city, state, or zip code"
+              type="text"
+              value={location}
+              onChange={handleLocationChange}
+              placeholder="Enter city, state, or zip code"
             />
-            <button onClick={handleSearch}>Search</button>
-            <button onClick={handleClear}>Clear</button>
-            <button onClick={handleBack}>Back</button>
+          <button onClick={handleSearch}>Search</button>
+          <button onClick={handleClear}>Clear</button>
+          <button onClick={handleBack}>Back</button>
         </div>
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <div className="service-provider-list">
-            {serviceProviders.length === 0 ? (
-                <p>No service provider found, try entering a different location</p>
+            {hasSearched && serviceProviders.length === 0 ? (
+              <p>No service provider found, try entering a different location</p>
         ) : (
         serviceProviders.map((provider) => (
             <div key={provider.id} className="service-provider">
-                <h3>{provider.businessName}</h3>
-                <p>{provider.businessAddress}</p>
-                <p>{provider.priceRange}</p>
-                <p>{provider.bio}</p>
-                <p>Distance: {provider.distance} meters</p>
+              <h3>{provider.businessName}</h3>
+              <p>{provider.businessAddress}</p>
+              <p>{provider.priceRange}</p>
+              <p>{provider.bio}</p>
+              <p>Distance: {provider.distance} meters</p>
             </div>
-           ))
+          ))
         )}
       </div>
     </div>

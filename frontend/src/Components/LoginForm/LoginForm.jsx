@@ -71,7 +71,11 @@ const LoginForm = () => {
         const data = await response.json();
         localStorage.setItem("user", JSON.stringify(data));
         updateUser(data);
-        navigate("/homepage");
+        if (data.userType === "service-provider") {
+          navigate(`/provider-homepage/${data.id}`);
+        } else {
+          navigate("/homepage");
+        }
       } else {
         setErrorMessage("Invalid email or password, please try again.")
       }

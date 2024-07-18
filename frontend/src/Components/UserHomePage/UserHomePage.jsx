@@ -2,9 +2,9 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import NavBar from "../NavBar/NavBar";
-import "./HomePage.css";
+import "./UserHomePage.css";
 
-const HomePage = () => {
+const UserHomePage = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState('');
@@ -42,4 +42,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default UserHomePage;

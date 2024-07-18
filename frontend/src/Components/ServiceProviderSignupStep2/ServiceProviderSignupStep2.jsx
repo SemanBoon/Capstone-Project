@@ -18,9 +18,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const savedFormData = JSON.parse(
-      localStorage.getItem("serviceProviderFormData")
-    );
+    const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
     if (savedFormData) {
       setInitialData(savedFormData);
     }
@@ -55,8 +53,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
     });
 
     try {
-      const signupResponse = await fetch(
-        `${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`,
+      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`,
         {
           method: "POST",
           body: formDataToSend,
@@ -66,13 +63,9 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
       if (signupResponse.ok) {
         localStorage.removeItem("serviceProviderFormData");
 
-        const loginResponse = await fetch(
-          `${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
-          {
+        const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,{
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" } ,
             body: JSON.stringify({
               email: initialData.email,
               password: initialData.password,
@@ -84,7 +77,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           const loginData = await loginResponse.json();
           localStorage.setItem("user", JSON.stringify(loginData));
           updateUser(loginData);
-          navigate("/homepage");
+          navigate(loginData.redirectTo);
         } else {
           setErrorMessage("Login Failed");
         }
@@ -119,9 +112,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
        <AddressLookupComponent onSelect={handleAddressSelect} />
         <br />
         <br />
-
         <label htmlFor="priceRange">Price Range:</label>
-
         <input
           type="text"
           id="priceRange"
@@ -134,7 +125,6 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
        <br />
        <br />
         <label htmlFor="bio">Short Bio:</label>
-
         <textarea
           id="bio"
           name="bio"
@@ -143,7 +133,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
-        <br />
+       <br />
        <br />
        <label htmlFor="services">Services:</label>
         <select
@@ -161,20 +151,11 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         </select>
         <br />
         <br />
-        <button className="signup-button" onClick={handleSignup}>
-          Sign Up
-        </button>
+        <button className="signup-button" onClick={handleSignup}>Sign Up</button>
+        <button className="back-button" onClick={handleBack}>Back</button>
 
-        <button className="back-button" onClick={handleBack}>
-          Back
-        </button>
-
-        {errorMessage && (
-          <p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>
-        )}
-
+        {errorMessage && (<p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>)}
       </div>
-
     </div>
   );
 };

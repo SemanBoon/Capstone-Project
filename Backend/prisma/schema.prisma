@@ -13,27 +13,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  phoneNumber String
+model user {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  phoneNumber    String
   hashedPassword String
-  name     String
-  userType String
-  profilePhoto Bytes?
-  userAddress String
+  name           String
+  userType       String
+  profilePhoto   Bytes?
+  userAddress    String
 }
 
-model ServiceProvider {
-  id       String   @id @default(cuid())
-  email String @unique
-  businessName     String
-  businessAddress    String
-  phoneNumber   String
+model serviceProvider {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  businessName   String
+  businessAddress String
+  phoneNumber    String
   hashedPassword String
-  userType String
-  services String
-  profilePhoto Bytes?
-  bio String
-  priceRange String
+  userType       String
+  services       String
+  profilePhoto   Bytes?
+  bio            String
+  priceRange     String
+  appointments   appointment[]
+  reviews        review[]
+  media          media[]
+}
+
+model appointment {
+  id                String   @id @default(cuid())
+  date              DateTime
+  time              DateTime
+  customerId        String
+  serviceProviderId String
+  serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
+}
+
+model review {
+  id                String   @id @default(cuid())
+  text              String
+  rating            Int
+  customerId        String
+  serviceProviderId String
+  serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
+}
+
+model media {
+  id                String   @id @default(cuid())
+  url               String
+  type              String
+  serviceProviderId String
+  serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
 }

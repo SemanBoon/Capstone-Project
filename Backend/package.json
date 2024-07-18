@@ -8,7 +8,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@arcgis/core": "^4.30.8",
     "@arcgis/map-components": "^4.30.5",
@@ -20,7 +19,6 @@
     "dotenv": "^16.4.5",
     "esri-loader": "^3.7.0",
     "express": "^4.19.2",
-    "express-flash": "^0.0.2",
     "express-flash": "^0.0.2",
     "express-session": "^1.18.0",
     "geolib": "^3.3.4",
@@ -35,10 +33,11 @@
     "pg-hstore": "^2.3.4",
     "places.js": "^1.19.0",
     "react-router-dom": "^6.24.1",
+    "react-toastify": "^10.0.5",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "prisma": "^5.16.2"
-    "prisma": "^5.16.2"
-  }
+    "prisma": "^5.17.0"
+  },
+  "description": ""
 }

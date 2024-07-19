@@ -21,7 +21,6 @@
     "esri-loader": "^3.7.0",
     "express": "^4.19.2",
     "express-flash": "^0.0.2",
-    "express-flash": "^0.0.2",
     "express-session": "^1.18.0",
     "geolib": "^3.3.4",
     "jsonwebtoken": "^9.0.2",
@@ -38,7 +37,6 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "prisma": "^5.16.2"
     "prisma": "^5.16.2"
   }
 }

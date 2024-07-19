@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
+import UserAddressLookup from "../UserAddressLookup/UserAddressLookup"
 import "./SignupForm.css";
 
 const capitalizedName = (name) => {
@@ -21,7 +22,8 @@ const SignupForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("");
+  const [userAddress, setUserAddress] = useState("");
   const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -39,6 +41,10 @@ const SignupForm = () => {
 
   const handleChangeUserName = (e) => {
     setUserName(e.target.value);
+  };
+
+  const handleAddressSelect = (suggestion) => {
+    setUserAddress(suggestion.text);
   };
 
   const handleSignup = async (e) => {
@@ -79,6 +85,7 @@ const SignupForm = () => {
             email: formattedEmail,
             phoneNumber: userPhone,
             password: userPassword,
+            userAddress: userAddress,
             userType: "user",
           }),
         }
@@ -88,6 +95,7 @@ const SignupForm = () => {
         setUserEmail("");
         setUserPassword("");
         setUserPhone("");
+        setUserAddress("");
 
         const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
         {
@@ -158,6 +166,10 @@ const SignupForm = () => {
           onChange={handleChangePhone}
           required
         />
+        <br />
+        <br />
+        <label htmlFor="userAddress">Address:</label>
+        <UserAddressLookup onSelect={handleAddressSelect} />
         <br />
         <br />
         <label htmlFor="userPassword">Password:</label>

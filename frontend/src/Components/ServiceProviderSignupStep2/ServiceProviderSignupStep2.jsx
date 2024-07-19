@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
+import AddressLookupComponent from "../AddressLookupComponent/AddressLookupComponent";
 import "./ServiceProviderSignupStep2.css";
 
 const ServiceProviderSignupStep2 = ({ setStep }) => {
@@ -16,10 +16,11 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
   const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
-  const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
-    const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
+    const savedFormData = JSON.parse(
+      localStorage.getItem("serviceProviderFormData")
+    );
     if (savedFormData) {
       setInitialData(savedFormData);
     }
@@ -28,38 +29,14 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
 
-    if (name === "businessAddress") {
-      getSuggestions(value);
-    }
+  const handleAddressSelect = (suggestion) => {
+    setFormData({ ...formData, businessAddress: suggestion.text });
   };
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, profilePhoto: e.target.files[0] });
-  };
-
-  const getSuggestions = async (query) => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
-    try {
-      const response = await axios.get("http://api.geonames.org/searchJSON", {
-        params: {
-          q: query,
-          maxRows: 8,
-          username: "SewaBenson",
-        },
-      });
-      setSuggestions(response.data.geonames);
-    } catch (error) {
-      console.error("Error fetching address suggestions:", error);
-    }
-  };
-
-  const handleSuggestionClick = (suggestion) => {
-    setFormData({ ...formData, businessAddress: suggestion });
-    setSuggestions([]);
   };
 
   const handleBack = () => {
@@ -97,8 +74,8 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                email: initialData.email,
-                password: initialData.password,
+              email: initialData.email,
+              password: initialData.password,
             }),
           }
         );
@@ -111,14 +88,14 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         } else {
           setErrorMessage("Login Failed");
         }
-        } else {
+      } else {
         const errorData = await signupResponse.json();
-        if (errorData.error === "Email already in use"){
-            setErrorMessage("Email already in use")
+        if (errorData.error === "Email already in use") {
+          setErrorMessage("Email already in use");
         } else {
-            setErrorMessage("Signup Failed");
+          setErrorMessage("Signup Failed");
         }
-    }
+      }
     } catch (error) {
       setErrorMessage("An error occurred, please try again");
     }
@@ -139,27 +116,12 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         <br />
         <br />
         <label htmlFor="businessAddress">Business Address:</label>
-        <input
-          type="text"
-          id="businessAddress"
-          name="businessAddress"
-          placeholder="Enter Business Address"
-          value={formData.businessAddress}
-          onChange={handleChange}
-          required
-        />
-        {suggestions.length > 0 && (
-          <ul className="suggestions-list">
-            {suggestions.map((suggestion) => (
-              <li key={suggestion.geonameId} onClick={() => handleSuggestionClick(suggestion.name)}>
-                {suggestion.name}, {suggestion.adminName1}, {suggestion.countryName}
-              </li>
-            ))}
-          </ul>
-        )}
+       <AddressLookupComponent onSelect={handleAddressSelect} />
         <br />
         <br />
+
         <label htmlFor="priceRange">Price Range:</label>
+
         <input
           type="text"
           id="priceRange"
@@ -169,9 +131,10 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
-        <br />
-        <br />
+       <br />
+       <br />
         <label htmlFor="bio">Short Bio:</label>
+
         <textarea
           id="bio"
           name="bio"
@@ -181,8 +144,8 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           required
         />
         <br />
-        <br />
-        <label htmlFor="services">Services:</label>
+       <br />
+       <label htmlFor="services">Services:</label>
         <select
           id="services"
           name="services"
@@ -191,17 +154,27 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           required
         >
           <option value="">Select a Service</option>
-          <option value="Braids">Braids</option>
-          <option value="Haircuts">Haircuts</option>
-          <option value="Weave and Installs">Weave and Installs</option>
-          <option value="Locs">Locs</option>
+          <option value="braids">Braids</option>
+          <option value="haircuts">Haircuts</option>
+          <option value="weave and installs">Weave and Installs</option>
+          <option value="locs">Locs</option>
         </select>
         <br />
         <br />
-        <button className="signup-button" onClick={handleSignup}>Sign Up</button>
-        <button className="back-button" onClick={handleBack}>Back</button>
-        {errorMessage && (<p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>)}
+        <button className="signup-button" onClick={handleSignup}>
+          Sign Up
+        </button>
+
+        <button className="back-button" onClick={handleBack}>
+          Back
+        </button>
+
+        {errorMessage && (
+          <p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>
+        )}
+
       </div>
+
     </div>
   );
 };

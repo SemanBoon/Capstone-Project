@@ -17,6 +17,19 @@ const capitalizedEmail = (email) => {
 };
 
 
+const capitalizedName = (name) => {
+  return name
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+const capitalizedEmail = (email) => {
+  return email.charAt(0).toUpperCase() + email.slice(1).toLowerCase();
+};
+
+
 const SignupForm = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");

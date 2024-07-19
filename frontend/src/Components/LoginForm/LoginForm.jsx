@@ -2,12 +2,20 @@ import React, { useState, useContext, useReducer } from "react";
 import { UserContext } from "../../UserContext";
 import { useNavigate } from "react-router-dom";
 import SelectProfileModal from "../SelectProfileModal/SelectProfileModal";
+import React, { useState, useContext, useReducer } from "react";
+import { UserContext } from "../../UserContext";
+import { useNavigate } from "react-router-dom";
+import SelectProfileModal from "../SelectProfileModal/SelectProfileModal";
 import "./LoginForm.css";
+
 
 
 const LoginForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
+  const { updateUser } = useContext(UserContext);
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("")
   const { updateUser } = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("")

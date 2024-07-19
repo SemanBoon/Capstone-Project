@@ -5,8 +5,6 @@ const multer = require("multer");
 const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
-const app = express();
-const bcrypt = require("bcrypt");
 const saltRounds = 14;
 require("dotenv").config();
 const storage = multer.memoryStorage();

@@ -6,12 +6,13 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
 const saltRounds = 14;
-require("dotenv").config();
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-require('dotenv').config();
 app.use(cors());
 app.use(express.json());
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+require("dotenv").config();
+
 
 const PORT = process.env.PORT || 5174;
 

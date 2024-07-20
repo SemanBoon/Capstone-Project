@@ -301,21 +301,12 @@ app.get('/service-provider-profile/:id', async (req, res) => {
   res.json(profile);
 });
 
-
 // Fetch all reviews of a single service provider
 app.get('/service-provider-reviews', async (req, res) => {
   const reviews = await prisma.review.findMany({
     where: { serviceProviderId: req.query.id },
   });
   res.json(reviews);
-});
-
-// Upload photos and videos of service provider
-app.post('/upload-media', upload.single('file'), async (req, res) => {
-  // Save the file to a storage service and return the URL
-  const file = req.file;
-  const url = `http://localhost:5174/uploads/${file.filename}`; // Replace with actual storage logic
-  res.json({ url, type: file.mimetype.startsWith('image/') ? 'image' : 'video' });
 });
 
 // Update service provider profile
@@ -350,7 +341,7 @@ app.put('/update-services', async (req, res) => {
   res.json(updatedServices);
 });
 
-//  Retrieve the list of services offered by a specific service provider.
+//  Gets the list of services offered by a specific service provider.
 app.get('/service-provider-services/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -363,26 +354,3 @@ app.get('/service-provider-services/:id', async (req, res) => {
   }
 });
 
-//delete a service
-app.delete('/delete-service', async (req, res) => {
-  const { id, service } = req.body;
-  try {
-    // Fetch the current services
-    const provider = await prisma.serviceProvider.findUnique({
-      where: { id },
-    });
-
-    // Filter out the service to be deleted
-    const updatedServices = provider.services.filter(s => s !== service);
-
-    // Update the services in the database
-    const updatedProvider = await prisma.serviceProvider.update({
-      where: { id },
-      data: { services: updatedServices },
-    });
-
-    res.json(updatedProvider);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});

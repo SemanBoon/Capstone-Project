@@ -15,6 +15,30 @@ datasource db {
 
 
 model User {
+<<<<<<< HEAD
+  id       String   @id @default(cuid())
+  email    String   @unique
+  phoneNumber String
+  hashedPassword String
+  name     String
+  userType String
+  profilePhoto Bytes?
+  userAddress String?
+}
+
+model ServiceProvider {
+  id       String   @id @default(cuid())
+  email String @unique
+  businessName     String
+  businessAddress    String
+  phoneNumber   String
+  hashedPassword String
+  userType String
+  services String
+  profilePhoto Bytes?
+  bio String
+  priceRange String
+=======
   id       String   @id @default(cuid())
   email    String   @unique
   phoneNumber String
@@ -37,4 +61,5 @@ model ServiceProvider {
   profilePhoto Bytes?
   bio String
   priceRange String
+>>>>>>> main
 }

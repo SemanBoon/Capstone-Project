@@ -2,9 +2,9 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import NavBar from "../NavBar/NavBar";
-import "./HomePage.css";
+import "./UserHomePage.css";
 
-const HomePage = () => {
+const UserHomePage = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState('');
@@ -13,6 +13,10 @@ const HomePage = () => {
     localStorage.removeItem("user");
     updateUser(null);
     navigate("/login");
+    window.history.pushState(null, "", window.location.href); 
+    window.addEventListener("popstate", () => {
+      navigate("/login");
+    });
   };
 
   const handleCategoryClick = (category) => {
@@ -26,7 +30,7 @@ const HomePage = () => {
   return (
     <>
     <div className="homepage-header">
-      <h1>Welcome to the SheBraids</h1>
+      <h1>Welcome to the SheBraids, {user.name}!</h1>
       <h3>Find Your Perfect Match</h3>
     </div>
     <div className = "container">
@@ -42,4 +46,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default UserHomePage;

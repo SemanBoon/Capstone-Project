@@ -1,14 +1,6 @@
 .homepage-header {
-<<<<<<< HEAD
-  background-color: #f5f5f5;
-  padding: 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-=======
   text-align: center;
   padding: 20px;
->>>>>>> main
 }
 
 .homepage-header h1 {
@@ -25,46 +17,6 @@
 
 .container {
   display: flex;
-<<<<<<< HEAD
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.category {
-  width: 200px;
-  height: 200px;
-  margin: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ff8400;
-}
-
-.category:hover {
-  background-color: #f5f5f5;
-}
-
-.logout-button {
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 20%;
-}
-
-.logout-button:hover {
-  background-color: #444;
-}
-=======
   justify-content: space-around;
   flex-wrap: wrap;
   margin-top: 20px;
@@ -127,4 +79,3 @@
   background-color: #e0e0e0;
 }
 
->>>>>>> main

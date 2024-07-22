@@ -49,11 +49,6 @@ const ServicesPage = () => {
         }
     };
 
-    // const handlePriceChange = (e) => {
-    //     const value = e.target.value;
-    //     setNewService({ ...newService, price: value });
-    // };
-
     const handleDeleteService = async (serviceId) => {
         try {
             await fetch(`http://localhost:5174/delete-service`, {

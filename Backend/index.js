@@ -355,7 +355,7 @@ app.post('/add-service', async (req, res) => {
       data: {
         name,
         description,
-        price,
+        price: parseFloat(price),
         serviceProviderId
       }
     });

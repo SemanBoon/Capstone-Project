@@ -1,26 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./ServiceProviderSignupStep1.css";
 
-const capitalizedName = (providerName) => {
-  return providerName
-    .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
-const capitalizedEmail = (providerEmail) => {
-  return providerEmail.charAt(0).toUpperCase() + providerEmail.slice(1).toLowerCase();
-};
-
 const ServiceProviderSignupStep1 = ({ setStep }) => {
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     businessName: "",
     email: "",
     phoneNumber: "",
     password: "",
   });
-  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
@@ -48,18 +36,26 @@ const ServiceProviderSignupStep1 = ({ setStep }) => {
     }
     const phonePattern = /^\d{10}$|^\d{3}-\d{3}-\d{4}$/;
     if (!phonePattern.test(formData.phoneNumber)) {
-        setErrorMessage("Please enter a valid phone number.");
-        return;
+      setErrorMessage("Please enter a valid phone number.");
+      return;
     }
 
     setErrorMessage("");
 
-    localStorage.setItem("serviceProviderFormData", JSON.stringify(formData));
-    setStep(2);
+    const formattedData = {
+      ...formData,
+      email: formData.email.toLowerCase(),
+      businessName: formData.businessName
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
     };
 
-    const formattedName = capitalizedName(formData.businessName);
-    const formattedEmail = capitalizedEmail(formData.email);
+    localStorage.setItem("serviceProviderFormData", JSON.stringify(formattedData));
+    setFormData(formattedData);
+    setStep(2);
+  };
 
 
   return (
@@ -72,7 +68,7 @@ const ServiceProviderSignupStep1 = ({ setStep }) => {
           id="businessName"
           name="businessName"
           placeholder="Enter Business Name or Full Name"
-          value={formattedName}
+          alue={formData.businessName}
           onChange={handleChange}
           required
         />
@@ -84,7 +80,7 @@ const ServiceProviderSignupStep1 = ({ setStep }) => {
           id="email"
           name="email"
           placeholder="Enter Email Address"
-          value={formattedEmail}
+          value={formData.email}
           onChange={handleChange}
           required
         />

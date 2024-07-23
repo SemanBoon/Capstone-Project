@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,12 +8,14 @@ import {
   Pin,
   InfoWindow,
 } from "@vis.gl/react-google-maps";
+import { UserContext } from '../../UserContext';
 
 const apiKey = 'AIzaSyBwyPWvQIc3BM2Pe5EeL1WhGOLof06bb7g';
 
 const ServiceProviderModal = ({ show, handleClose, provider }) => {
     const [services, setServices] = useState([]);
     const navigate = useNavigate();
+    const { user } = useContext(UserContext)
 
     useEffect(() => {
         if (provider && provider.id) {
@@ -42,7 +44,7 @@ const ServiceProviderModal = ({ show, handleClose, provider }) => {
     };
 
     const handleBookAppointment = () => {
-        navigate(`/book-appointment/${provider.id}`);
+        navigate(`/book-appointment/${provider.id}`, { state: { providerId: provider.id } });
     };
 
     return (

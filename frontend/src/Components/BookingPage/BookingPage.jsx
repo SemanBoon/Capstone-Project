@@ -29,7 +29,6 @@ const BookingPage = () => {
             if (!response.ok) {
                 throw new Error('Failed to book appointment');
             }
-
             navigate('/homepage');
             } catch (error) {
             console.error('Error booking appointment:', error);
@@ -59,7 +58,6 @@ const BookingPage = () => {
                 />
             </div>
             <div className="form-group">
-                {/* <label htmlFor="time">Description</label> */}
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}

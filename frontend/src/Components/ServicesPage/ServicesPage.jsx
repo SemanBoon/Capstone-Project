@@ -20,7 +20,7 @@ const ServicesPage = () => {
                 throw new Error('Failed to fetch services');
             }
             const data = await response.json();
-            setServices(data.service || []);
+            setServices(data || []);
         }   catch (error) {
             console.error(error);
             setServices([]);
@@ -41,7 +41,7 @@ const ServicesPage = () => {
             }
             const data = await response.json();
                 setServices([...services, data]);
-                setNewService({ name: '', description: '', price: '' });
+                setNewService({ name: '', description: '', price: 0.0 });
                 setShowForm(false);
         } catch (error) {
             console.error(error);
@@ -94,7 +94,7 @@ const ServicesPage = () => {
             <ul>
                 {services.map(service => (
                     <li key={service.id}>
-                        {service.name} - {service.description} - {parseFloat(service.price).toFixed(2)}
+                        {service.name} - {service.description} - ${parseFloat(service.price).toFixed(2)}
                         <button onClick={() => handleDeleteService(service.id)}>Delete</button>
                     </li>
                 ))}

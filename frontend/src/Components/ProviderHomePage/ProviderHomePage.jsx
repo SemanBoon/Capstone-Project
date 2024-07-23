@@ -92,10 +92,9 @@ const ProviderHomePage = () => {
         navigate(`/service-provider-profile/${id}`);
     };
 
-    const handleServicesUpdate = () => {
-        navigate(`/service-provider-services/${id}`);
-    };
-
+    // const handleServicesUpdate = () => {
+    //     navigate(`/service-provider-services/${id}`);
+    // };
 
     return (
         <div className="service-provider-homepage">
@@ -148,12 +147,27 @@ const ProviderHomePage = () => {
                 {reviews.length > 0 && <button>View More Reviews</button>}
             </section>
             <section>
-                <h2>Manage Profile</h2>
-                <button onClick={() => handleProfileUpdate(profile)}>View Profile</button>
-            </section>
-            <section>
-                <h2>Manage Services</h2>
-                    <button onClick={() => handleServicesUpdate(services)}>View Services</button>
+                <h2>Your Services</h2>
+                {services.length > 0 ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {services.map(service => (
+                                <tr key={service.id}>
+                                    <td>{service.name}</td>
+                                    <td>{service.description}</td>
+                                    <td>${parseFloat(service.price).toFixed(2)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (<p>You have no services available.</p>)}
             </section>
         </div>
     );

@@ -294,10 +294,58 @@ app.get('/provider-homepage/:id', async (req, res) => {
   }
 });
 
-// api to get all appointments
-app.get('/appointments', async (req, res) => {
-  const appointments = await prisma.appointment.findMany();
-  res.json(appointments);
+//to create an appointment
+app.post('/create-appointment', async (req, res) => {
+  const { userId, providerId, date, time, description } = req.body;
+  try {
+    const newAppointment = await prisma.appointment.create({
+      data: {
+        customerId: userId,
+        serviceProviderId: providerId,
+        date: new Date(date),
+        time: time,
+        description,
+      },
+    });
+    res.status(201).json(newAppointment);
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+    res.status(500).json({ error: 'Failed to create appointment' });
+  }
+});
+
+// api to get all appointments for the user
+app.get('/appointments/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const appointments = await prisma.appointment.findMany({
+      where: { customerId: userId },
+      include: {
+        serviceProvider: true,
+      },
+    });
+    res.json(appointments);
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    res.status(500).json({ error: 'Failed to fetch appointments' });
+  }
+});
+
+// api to get all appointments for the service provider
+app.get('/service-provider-appointments/:providerId', async (req, res) => {
+  const { providerId } = req.params;
+  try {
+    const appointments = await prisma.appointment.findMany({
+      where: { serviceProviderId: providerId },
+      include: {
+        user: true,
+      },
+    });
+    res.json(appointments);
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    res.status(500).json({ error: 'Failed to fetch appointments' });
+  }
 });
 
 // Fetch a specific service provider profile

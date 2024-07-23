@@ -14,6 +14,7 @@ import ProviderHomePage from "./Components/ProviderHomePage/ProviderHomePage";
 import ProviderProfilePage from "./Components/ProviderProfilePage/ProviderProfilePage";
 import ServicesPage from "./Components/ServicesPage/ServicesPage";
 import PrivateRoute from "./Components/PrivateRoute";
+import BookingPage from "./Components/BookingPage/BookingPage";
 import { ToastContainer } from 'react-toastify';
 import "./App.css";
 import 'react-toastify/dist/ReactToastify.css';
@@ -56,6 +57,7 @@ function App() {
             <Route path="/provider-homepage/:id" element={<PrivateRoute element= {ProviderHomePage} />} />
             <Route path="/service-provider-profile/:id" element={<PrivateRoute element= {ProviderProfilePage} />} />
             <Route path="/service-provider-services/:id" element={<PrivateRoute element= {ServicesPage} />} />
+            <Route path="/book-appointment/:providerId" element={<PrivateRoute element={BookingPage} />} />
           </Routes>
           {user && <UserWebSocket userId={user.id} />}
         </Router>

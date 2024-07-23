@@ -86,8 +86,6 @@ const SearchPage = () => {
         serviceProviders.map((provider) => (
             <div key={provider.id} className="service-provider" onClick={() => handleProviderClick(provider)}>
               <h3>{provider.businessName}</h3>
-              <p>{provider.businessAddress}</p>
-              <p>{provider.priceRange}</p>
               <p>{provider.bio}</p>
               <p>Distance: {provider.distance} meters</p>
             </div>

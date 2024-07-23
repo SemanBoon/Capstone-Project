@@ -40,6 +40,7 @@ model serviceProvider {
   appointments   appointment[]
   reviews        review[]
   media          media[]
+  service        Service[]
 }
 
 model appointment {
@@ -74,4 +75,13 @@ model Notification {
   message   String
   delivered Boolean @default(false)
   user      user     @relation(fields: [userId], references: [id])
+}
+
+model Service {
+  id                String   @id @default(cuid())
+  name              String
+  description       String
+  price             Float
+  serviceProviderId String
+  serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
 }

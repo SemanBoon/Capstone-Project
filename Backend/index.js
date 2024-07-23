@@ -247,7 +247,6 @@ const getGeocode = async (address) => {
 
 app.post('/api/search', async (req, res) => {
   const { address, category } = req.body;
-
   try {
     const userLocation = await getGeocode(address);
     const serviceProviders = await prisma.serviceProvider.findMany({
@@ -348,49 +347,63 @@ app.put('/update-profile', async (req, res) => {
   }
 });
 
-// Allow service providers to update their list of services.
-app.put('/update-services', async (req, res) => {
-  const { id, services } = req.body;
-  const updatedServices = await prisma.serviceProvider.update({
-    where: { id },
-    data: { services },
-  });
-  res.json(updatedServices);
-});
-
-//  Retrieve the list of services offered by a specific service provider.
-app.get('/service-provider-services/:id', async (req, res) => {
-  const { id } = req.params;
+//adding a new service
+app.post('/add-service', async (req, res) => {
+  const { serviceProviderId, name, description, price } = req.body;
   try {
-    const provider = await prisma.serviceProvider.findUnique({
-      where: { id },
+    const newService = await prisma.service.create({
+      data: {
+        name,
+        description,
+        price: parseFloat(price),
+        serviceProviderId
+      }
     });
-    res.json(provider.services);
+    res.status(200).json(newService);
   } catch (e) {
+    console.error('Error adding service:', e);
     res.status(500).json({ error: e.message });
   }
 });
 
+//fetching all services for a specific service provider
+app.get('/service-provider-services/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const services = await prisma.service.findMany({
+      where: { serviceProviderId: id }
+    });
+    res.status(200).json(services);
+  } catch (e) {
+    console.error('Error fetching services:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Allow service providers to update their list of services.
+app.put('/update-services', async (req, res) => {
+  const { id, name, description, price } = req.body;
+  const updatedServices = await prisma.serviceProvider.update({
+    where: { id },
+    data: {
+      name,
+      description,
+      price,
+    }
+  });
+  res.status(200).json(updatedServices);
+});
+
 //delete a service
 app.delete('/delete-service', async (req, res) => {
-  const { id, service } = req.body;
+  const { id } = req.body;
   try {
-    // Fetch the current services
-    const provider = await prisma.serviceProvider.findUnique({
+    const deletedService = await prisma.service.delete({
       where: { id },
     });
-
-    // Filter out the service to be deleted
-    const updatedServices = provider.services.filter(s => s !== service);
-
-    // Update the services in the database
-    const updatedProvider = await prisma.serviceProvider.update({
-      where: { id },
-      data: { services: updatedServices },
-    });
-
-    res.json(updatedProvider);
+    res.status(200).json(deletedService);
   } catch (e) {
+    console.error('Error deleting service:', e);
     res.status(500).json({ error: e.message });
   }
 });

@@ -92,10 +92,6 @@ const ProviderHomePage = () => {
         navigate(`/service-provider-profile/${id}`);
     };
 
-    // const handleServicesUpdate = () => {
-    //     navigate(`/service-provider-services/${id}`);
-    // };
-
     return (
         <div className="service-provider-homepage">
             <ProviderNavBar id={id}/>

@@ -20,7 +20,7 @@ const ProviderHomePage = () => {
 
     const fetchAppointments = async () => {
         try {
-            const response = await fetch(`http://localhost:5174/appointments`);
+            const response = await fetch(`http://localhost:5174/service-provider-appointments/${id}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch appointments");
             }
@@ -92,10 +92,6 @@ const ProviderHomePage = () => {
         navigate(`/service-provider-profile/${id}`);
     };
 
-    // const handleServicesUpdate = () => {
-    //     navigate(`/service-provider-services/${id}`);
-    // };
-
     return (
         <div className="service-provider-homepage">
             <ProviderNavBar id={id}/>
@@ -107,14 +103,30 @@ const ProviderHomePage = () => {
             </section>
             <section>
                 <h2>Your Appointments</h2>
-                {appointments.length > 0 ? ( appointments.map(appointment => (
-                    <div key={appointment.id}>
-                        <p>Customer: {appointment.customerName}</p>
-                        <p>Date: {appointment.date}</p>
-                        <p>Time: {appointment.time}</p>
-                    </div>
-                ))) : (<p>You have no bookings available</p>)
-                }
+                {appointments.length > 0 ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {appointments.map(appointment => (
+                                <tr key={appointment.id}>
+                                    <td>{appointment.user.name}</td>
+                                    <td>{new Date(appointment.date).toLocaleDateString()}</td>
+                                    <td>{appointment.time}</td>
+                                    <td>{appointment.description}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p>You have no bookings available</p>
+                )}
                 {appointments.length > 0 && <button>View More</button>}
             </section>
             <section>

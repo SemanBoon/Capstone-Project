@@ -23,6 +23,7 @@ model user {
   profilePhoto   Bytes?
   userAddress    String
   notifications  Notification[]
+  appointments   appointment[]
 }
 
 model serviceProvider {
@@ -46,10 +47,13 @@ model serviceProvider {
 model appointment {
   id                String   @id @default(cuid())
   date              DateTime
-  time              DateTime
+  time              String
   customerId        String
+  description       String
   serviceProviderId String
   serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
+  user              user            @relation(fields: [customerId], references: [id])
+
 }
 
 model review {

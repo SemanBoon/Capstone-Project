@@ -13,6 +13,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 model user {
   id             String   @id @default(cuid())
   email          String   @unique
@@ -42,6 +44,7 @@ model serviceProvider {
   reviews        review[]
   media          media[]
   service        Service[]
+  schedule       Json?
 }
 
 model appointment {
@@ -53,7 +56,6 @@ model appointment {
   serviceProviderId String
   serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
   user              user            @relation(fields: [customerId], references: [id])
-
 }
 
 model review {
@@ -88,4 +90,5 @@ model Service {
   price             Float
   serviceProviderId String
   serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
+  duration          Int
 }

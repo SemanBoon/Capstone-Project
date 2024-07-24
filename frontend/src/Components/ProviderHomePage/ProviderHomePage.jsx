@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ProviderNavBar from "../ProviderNavBar/ProviderNavBar";
+import ScheduleModal from "../ScheduleModal/ScheduleModal";
+import "./ProviderHomePage.css";
 
 const ProviderHomePage = () => {
     const { id } = useParams();
@@ -9,6 +11,11 @@ const ProviderHomePage = () => {
     const [reviews, setReviews] = useState([]);
     const [media, setMedia] = useState([]);
     const [services, setServices] = useState([]);
+    const [schedules, setSchedules] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [scheduleDate, setScheduleDate] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -16,6 +23,7 @@ const ProviderHomePage = () => {
         fetchProfile();
         fetchReviews();
         fetchServices();
+        fetchSchedules();
     }, []);
 
     const fetchAppointments = async () => {
@@ -23,9 +31,10 @@ const ProviderHomePage = () => {
             const response = await fetch(`http://localhost:5174/service-provider-appointments/${id}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch appointments");
+            } else {
+                const data = await response.json();
+                setAppointments(data);
             }
-            const data = await response.json();
-            setAppointments(data);
         }   catch (error) {
             console.error(error);
         }
@@ -70,6 +79,19 @@ const ProviderHomePage = () => {
         }
     };
 
+    const fetchSchedules = async () => {
+        try {
+          const response = await fetch(`http://localhost:5174/service-provider-schedule/${id}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch schedules');
+          }
+          const data = await response.json();
+          setSchedules(data || {});
+        } catch (error) {
+          console.error(error);
+        }
+    };
+
     const handleUpload = async (file) => {
         try {
             const formData = new FormData();
@@ -88,6 +110,30 @@ const ProviderHomePage = () => {
         }
     };
 
+    const handleScheduleSubmit = async () => {
+        try {
+            const response = await fetch('http://localhost:5174/setup-schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    providerId: id,
+                    date: scheduleDate,
+                    startTime,
+                    endTime,
+                }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to set up schedule');
+            }
+            setShowModal(false);
+            fetchSchedules();
+        }   catch (error) {
+            console.error('Error setting up schedule:', error);
+        }
+    };
+
     const handleProfileUpdate = () => {
         navigate(`/service-provider-profile/${id}`);
     };
@@ -101,6 +147,39 @@ const ProviderHomePage = () => {
                 <p>{profile.bio}</p>
                 <button onClick={handleProfileUpdate}>Edit Bio</button>
             </section>
+            <section>
+                <h2>Your Schedules</h2>
+                {Object.keys(schedules).length > 0 ? (
+                    <ul>
+                        {Object.keys(schedules).map(date => (
+                            <li key={date}>
+                                <strong>{date}:</strong>
+                                <ul>
+                                    {schedules[date].slots?.map((slot, index) => (
+                                        <li key={index}>
+                                            {new Date(slot).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        ))}
+                    </ul>
+                    ) : (
+                    <p>You have no schedules set up.</p>
+                )}
+                <button onClick={() => setShowModal(true)}>Set Up Schedule</button>
+            </section>
+            {showModal=== true && <ScheduleModal
+                showModal={showModal}
+                setShowModal={setShowModal}
+                handleScheduleSubmit={handleScheduleSubmit}
+                scheduleDate={scheduleDate}
+                setScheduleDate={setScheduleDate}
+                startTime={startTime}
+                setStartTime={setStartTime}
+                endTime={endTime}
+                setEndTime={setEndTime}
+            />}
             <section>
                 <h2>Your Appointments</h2>
                 {appointments.length > 0 ? (
@@ -127,7 +206,6 @@ const ProviderHomePage = () => {
                 ) : (
                     <p>You have no bookings available</p>
                 )}
-                {appointments.length > 0 && <button>View More</button>}
             </section>
             <section>
                 <h2>Upload Pictures and Videos of Your Work</h2>

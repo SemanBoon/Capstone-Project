@@ -33,8 +33,9 @@ CREATE TABLE "serviceProvider" (
 CREATE TABLE "appointment" (
     "id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "time" TIMESTAMP(3) NOT NULL,
+    "time" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "serviceProviderId" TEXT NOT NULL,
 
     CONSTRAINT "appointment_pkey" PRIMARY KEY ("id")
@@ -78,8 +79,20 @@ CREATE TABLE "Service" (
     "description" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "serviceProviderId" TEXT NOT NULL,
+    "duration" INTEGER NOT NULL,
 
     CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Schedule" (
+    "id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "startTime" TEXT NOT NULL,
+    "endTime" TEXT NOT NULL,
+    "serviceProviderId" TEXT NOT NULL,
+
+    CONSTRAINT "Schedule_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -92,6 +105,9 @@ CREATE UNIQUE INDEX "serviceProvider_email_key" ON "serviceProvider"("email");
 ALTER TABLE "appointment" ADD CONSTRAINT "appointment_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "appointment" ADD CONSTRAINT "appointment_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "review" ADD CONSTRAINT "review_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -102,3 +118,6 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Schedule" ADD CONSTRAINT "Schedule_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

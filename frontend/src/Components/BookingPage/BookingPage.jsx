@@ -9,6 +9,22 @@ const BookingPage = () => {
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [description, setDescription] = useState('');
+    const [services, setServices] = useState([]);
+
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await fetch(`http://localhost:5174/service-provider-services/${providerId}`);
+                const data = await response.json();
+                setServices(data);
+            } catch (error) {
+                console.error('Error fetching services:', error);
+            }
+        };
+        fetchServices();
+    }, [providerId]);
+
 
     const handleBookAppointment = async () => {
         try {
@@ -39,7 +55,18 @@ const BookingPage = () => {
         <div className="book-appointment-page">
             <h1>Book Appointment</h1>
             <div className="form-group">
-                <label htmlFor="time">Enter a date:</label>
+                <label htmlFor="service">Select a Service:</label>
+                <select id="service">
+                    <option value="">Select a service</option>
+                    {services.map(service => (
+                        <option key={service.id} value={service.id}>
+                            {service.name} - ${service.price}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="form-group">
+                <label htmlFor="date">Enter a date:</label>
                 <input
                     label
                     type="date"

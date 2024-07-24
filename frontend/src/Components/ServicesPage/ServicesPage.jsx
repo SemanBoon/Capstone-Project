@@ -4,9 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 const ServicesPage = () => {
     const { id } = useParams();
     const [services, setServices] = useState([]);
-    const [newService, setNewService] = useState({ name: '', description: '', price: 0.0 });
+    const [newService, setNewService] = useState({ name: '', description: '', price: 0.0, duration: 0 });
     const [showForm, setShowForm] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("")
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,7 +40,7 @@ const ServicesPage = () => {
             }
             const data = await response.json();
                 setServices([...services, data]);
-                setNewService({ name: '', description: '', price: 0.0 });
+                setNewService({ name: '', description: '', price: 0.0, duration: 0 });
                 setShowForm(false);
         } catch (error) {
             console.error(error);
@@ -87,6 +86,12 @@ const ServicesPage = () => {
                         onChange={(e) => setNewService({...newService, price: e.target.value})}
                         placeholder="Service Price"
                     />
+                    <input
+                        type="text"
+                        value={newService.duration}
+                        onChange={(e) => setNewService({...newService, duration: e.target.value})}
+                        placeholder="How long will this service take"
+                    />
                     <button onClick={handleAddService}>Add Service</button>
                     <button onClick={() => setShowForm(false)}>Cancel</button>
                 </div>
@@ -94,7 +99,7 @@ const ServicesPage = () => {
             <ul>
                 {services.map(service => (
                     <li key={service.id}>
-                        {service.name} - {service.description} - ${parseFloat(service.price).toFixed(2)}
+                        {service.name} - {service.description} - ${parseFloat(service.price).toFixed(2)} - {service.duration}
                         <button onClick={() => handleDeleteService(service.id)}>Delete</button>
                     </li>
                 ))}

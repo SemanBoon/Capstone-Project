@@ -8,13 +8,19 @@ const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
+app.use(express.json());
 const prisma = new PrismaClient();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT || 5174;
 
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+const PROXIMITY_RADIUS = 16093.4;
+const clients = new Map();
+
 
 server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
@@ -25,11 +31,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-app.use(express.json());
-
-const PROXIMITY_RADIUS = 16093.4;
-const clients = new Map();
 
 app.get("/", (req, res) => {
   res.send("Initial Selection Page");
@@ -348,15 +349,84 @@ app.get('/service-provider-appointments/:providerId', async (req, res) => {
   }
 });
 
+app.post('/setup-schedule', async (req, res) => {
+  const { providerId, date, startTime, endTime } = req.body;
+  try {
+    const start = new Date(`${date}T${startTime}`);
+    const end = new Date(`${date}T${endTime}`);
+    const slots = [];
+    const status = [];
+
+    while (start < end) {
+      slots.push(new Date(start));
+      status.push(0); // 0 To indicates the slot is not booked
+      start.setMinutes(start.getMinutes() + 30);
+    }
+
+    const newSchedule = {
+      [date]: {
+        slots,
+        status,
+      },
+    };
+
+    const provider = await prisma.serviceProvider.findUnique({
+      where: { id: providerId },
+      select: { schedule: true },
+    });
+
+    // Merge existing schedule with new schedule
+    const updatedSchedule = {
+      ...provider.schedule,
+      ...newSchedule,
+    };
+    // Update the service provider's schedule
+    const updatedProvider = await prisma.serviceProvider.update({
+      where: { id: providerId },
+      data: {
+        schedule: updatedSchedule,
+      },
+    });
+    res.status(200).json({ message: 'Schedule set up successfully', schedule: updatedProvider.schedule });
+  } catch (error) {
+    console.error('Error setting up schedule:', error);
+    res.status(500).json({ error: 'Failed to set up schedule' });
+  }
+});
+
+// Fetch schedules for a specific service provider
+app.get('/service-provider-schedule/:providerId', async (req, res) => {
+  const { providerId } = req.params;
+  try {
+    // Retrieve the service provider's schedule from the database
+    const provider = await prisma.serviceProvider.findUnique({
+      where: { id: providerId },
+      select: { schedule: true },
+    });
+
+    if (!provider) {
+      return res.status(404).json({ error: 'Service provider not found' });
+    }
+
+    res.status(200).json(provider.schedule);
+  } catch (error) {
+    console.error('Error retrieving schedule:', error);
+    res.status(500).json({ error: 'Failed to retrieve schedule' });
+  }
+});
+
 // Fetch a specific service provider profile
 app.get('/service-provider-profile/:id', async (req, res) => {
   const { id } = req.params;
-  const profile = await prisma.serviceProvider.findUnique({
-    where: { id },
-  });
-  res.json(profile);
+  try {
+    const profile = await prisma.serviceProvider.findUnique({
+      where: { id },
+    });
+    res.json(profile);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
-
 
 // Fetch all reviews of a single service provider
 app.get('/service-provider-reviews', async (req, res) => {
@@ -404,6 +474,7 @@ app.post('/add-service', async (req, res) => {
         name,
         description,
         price: parseFloat(price),
+        duration: parseInt(duration),
         serviceProviderId
       }
     });

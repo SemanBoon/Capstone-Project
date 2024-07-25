@@ -298,6 +298,13 @@ app.get('/provider-homepage/:id', async (req, res) => {
 app.post('/create-appointment', async (req, res) => {
   const { userId, providerId, date, time, description } = req.body;
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const newAppointment = await prisma.appointment.create({
       data: {
         customerId: userId,
@@ -307,6 +314,34 @@ app.post('/create-appointment', async (req, res) => {
         description,
       },
     });
+
+    const provider = await prisma.serviceProvider.findUnique({
+      where: { id: providerId },
+      select: { schedule: true },
+    });
+
+    if (provider && provider.schedule) {
+      const schedule = provider.schedule[date];
+      if (schedule) {
+        const slots = schedule.slots;
+        const status = schedule.status;
+        const slotIndex = slots.findIndex(slot => new Date(slot).toTimeString().slice(0, 5) === time);
+        if (slotIndex !== -1) {
+          status[slotIndex] = 1; // Mark as booked
+          const updatedSchedule = {
+            ...provider.schedule,
+            [date]: {
+              slots,
+              status,
+            },
+          };
+          await prisma.serviceProvider.update({
+            where: { id: providerId },
+            data: { schedule: updatedSchedule },
+          });
+        }
+      }
+    }
     res.status(201).json(newAppointment);
   } catch (error) {
     console.error('Error creating appointment:', error);

@@ -97,6 +97,13 @@ const BookingPage = () => {
 
     const filteredSlots = filterSlots(availableSlots);
 
+    const handleSlotClick = (slot) => {
+        setDate(slot.date);
+        const slotTime = new Date(slot.time);
+        const formattedTime = slotTime.toTimeString().slice(0, 5);
+        setTime(formattedTime);
+    };
+
     return (
         <div className="book-appointment-page">
             <h1>Book Appointment</h1>
@@ -141,7 +148,9 @@ const BookingPage = () => {
                 {filteredSlots.length > 0 ? (
                     <ul>
                         {filteredSlots.map((slot, index) => (
-                            <li key={index}>{slot.date} - {new Date(slot.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</li>
+                            <li key={index} onClick={() => handleSlotClick(slot)} style={{ cursor: 'pointer' }}>
+                                {slot.date} - {new Date(slot.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </li>
                         ))}
                     </ul>
                 ) : (

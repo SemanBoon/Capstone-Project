@@ -14,7 +14,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT || 5174;
 
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -23,7 +22,7 @@ const clients = new Map();
 
 
 server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`); //this concole.log is essential because it shows me that the backend is running and that it's running on the right port.
 });
 
 app.use(cors({
@@ -467,7 +466,7 @@ app.put('/update-profile', async (req, res) => {
 
 //adding a new service
 app.post('/add-service', async (req, res) => {
-  const { serviceProviderId, name, description, price } = req.body;
+  const { serviceProviderId, name, description, price, duration } = req.body;
   try {
     const newService = await prisma.service.create({
       data: {
@@ -501,13 +500,14 @@ app.get('/service-provider-services/:id', async (req, res) => {
 
 // Allow service providers to update their list of services.
 app.put('/update-services', async (req, res) => {
-  const { id, name, description, price } = req.body;
+  const { id, name, description, price, duration } = req.body;
   const updatedServices = await prisma.serviceProvider.update({
     where: { id },
     data: {
       name,
       description,
       price,
+      duration,
     }
   });
   res.status(200).json(updatedServices);
@@ -524,5 +524,36 @@ app.delete('/delete-service', async (req, res) => {
   } catch (e) {
     console.error('Error deleting service:', e);
     res.status(500).json({ error: e.message });
+  }
+});
+
+//gets all available slots
+app.post('/get-available-slots', async (req, res) => {
+  const { providerId, serviceDuration } = req.body;
+  try {
+    const provider = await prisma.serviceProvider.findUnique({
+      where: { id: providerId },
+      select: { schedule: true },
+    });
+    if (!provider) {
+      return res.status(404).json({ error: 'Service provider not found' });
+    }
+
+    const availableSlots = [];
+    const requiredSlots = Math.ceil(serviceDuration / 30);
+
+    for (const date in provider.schedule) {
+      const { slots, status } = provider.schedule[date];
+
+      for (let i = 0; i <= slots.length - requiredSlots; i++) {
+        if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
+          availableSlots.push({ date, time: slots[i] });
+        }
+      }
+    }
+    res.status(200).json(availableSlots);
+  } catch (error) {
+    console.error('Error fetching available slots:', error);
+    res.status(500).json({ error: 'Failed to fetch available slots' });
   }
 });

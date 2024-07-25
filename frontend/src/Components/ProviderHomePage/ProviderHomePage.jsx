@@ -169,7 +169,7 @@ const ProviderHomePage = () => {
                 )}
                 <button onClick={() => setShowModal(true)}>Set Up Schedule</button>
             </section>
-            {showModal=== true && <ScheduleModal
+            <ScheduleModal
                 showModal={showModal}
                 setShowModal={setShowModal}
                 handleScheduleSubmit={handleScheduleSubmit}
@@ -179,7 +179,7 @@ const ProviderHomePage = () => {
                 setStartTime={setStartTime}
                 endTime={endTime}
                 setEndTime={setEndTime}
-            />}
+            />
             <section>
                 <h2>Your Appointments</h2>
                 {appointments.length > 0 ? (
@@ -245,6 +245,7 @@ const ProviderHomePage = () => {
                                 <th>Service Name</th>
                                 <th>Description</th>
                                 <th>Price</th>
+                                <th>Duration</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -253,6 +254,7 @@ const ProviderHomePage = () => {
                                     <td>{service.name}</td>
                                     <td>{service.description}</td>
                                     <td>${parseFloat(service.price).toFixed(2)}</td>
+                                    <td>{service.duration}hrs</td>
                                 </tr>
                             ))}
                         </tbody>

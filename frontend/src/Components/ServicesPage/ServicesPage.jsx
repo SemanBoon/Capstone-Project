@@ -99,7 +99,7 @@ const ServicesPage = () => {
             <ul>
                 {services.map(service => (
                     <li key={service.id}>
-                        {service.name} - {service.description} - ${parseFloat(service.price).toFixed(2)} - {service.duration}
+                        {service.name} - {service.description} - ${parseFloat(service.price).toFixed(2)} - {service.duration}hrs
                         <button onClick={() => handleDeleteService(service.id)}>Delete</button>
                     </li>
                 ))}

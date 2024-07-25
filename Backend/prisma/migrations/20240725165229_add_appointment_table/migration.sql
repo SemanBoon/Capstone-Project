@@ -25,6 +25,7 @@ CREATE TABLE "serviceProvider" (
     "profilePhoto" BYTEA,
     "bio" TEXT NOT NULL,
     "priceRange" TEXT NOT NULL,
+    "schedule" JSONB,
 
     CONSTRAINT "serviceProvider_pkey" PRIMARY KEY ("id")
 );
@@ -33,7 +34,7 @@ CREATE TABLE "serviceProvider" (
 CREATE TABLE "appointment" (
     "id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "time" TEXT NOT NULL,
+    "time" TIMESTAMP(3) NOT NULL,
     "customerId" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "serviceProviderId" TEXT NOT NULL,
@@ -84,17 +85,6 @@ CREATE TABLE "Service" (
     CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Schedule" (
-    "id" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
-    "startTime" TEXT NOT NULL,
-    "endTime" TEXT NOT NULL,
-    "serviceProviderId" TEXT NOT NULL,
-
-    CONSTRAINT "Schedule_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -118,6 +108,3 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Schedule" ADD CONSTRAINT "Schedule_serviceProviderId_fkey" FOREIGN KEY ("serviceProviderId") REFERENCES "serviceProvider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

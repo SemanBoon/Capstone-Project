@@ -64,6 +64,7 @@ const BookingPage = () => {
                     date,
                     time,
                     description,
+                    serviceId: selectedService.id,
                 }),
             });
 
@@ -76,20 +77,19 @@ const BookingPage = () => {
         }
     };
 
+
     const filterSlots = (slots) => {
+        if (!selectedService)
+            return [];
+        const requiredSlots = Math.ceil(selectedService.duration / 30);
         return slots.filter(slot => {
             if (date && slot.date !== date)
                 return false;
-            if (time) {
-                const enteredTime = new Date(`${slot.date}T${time}`);
-                const slotTime = new Date(slot.time);
-                const diff = slotTime.getTime() - enteredTime.getTime();
-                if (diff >= 0 && diff < 30 * 60 * 1000) {
-                    return true;
-                } else if (diff < 0 && Math.abs(diff) < 30 * 60 * 1000) {
-                    return true;
+            const slotIndex = slots.findIndex(s => s.time === slot.time);
+            for (let i = 0; i < requiredSlots; i++) {
+                if (slotIndex + i >= slots.length || slots[slotIndex + i].status !== 0) {
+                    return false;
                 }
-                return false;
             }
             return true;
         });
@@ -158,7 +158,6 @@ const BookingPage = () => {
                 )}
             </div>
             <button onClick={handleBookAppointment}>Book Appointment</button>
-            <button onClick={() => navigate(-1)}>Cancel</button>
         </div>
     );
 };

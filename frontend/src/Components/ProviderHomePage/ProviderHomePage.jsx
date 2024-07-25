@@ -157,7 +157,7 @@ const ProviderHomePage = () => {
                                 <ul>
                                     {schedules[date].slots?.map((slot, index) => (
                                         <li key={index}>
-                                            {new Date(slot).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(slot).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {schedules[date].status && schedules[date].status[index] === 1 ? "Booked" : "Available"}
                                         </li>
                                     ))}
                                 </ul>

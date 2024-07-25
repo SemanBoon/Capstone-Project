@@ -333,7 +333,7 @@ app.post('/create-appointment', async (req, res) => {
         const status = schedule.status;
         const slotIndex = slots.findIndex(slot => new Date(slot).toTimeString().slice(0, 5) === time);
 
-        const requiredSlots = Math.ceil(service.duration / 30);
+        const requiredSlots = Math.ceil(service.duration * 60 / 30);
 
         if (slotIndex !== -1) {
           for (let i = 0; i < requiredSlots; i++) {
@@ -348,6 +348,7 @@ app.post('/create-appointment', async (req, res) => {
               status,
             },
           };
+
           await prisma.serviceProvider.update({
             where: { id: providerId },
             data: { schedule: updatedSchedule },
@@ -586,7 +587,7 @@ app.post('/get-available-slots', async (req, res) => {
     }
 
     const availableSlots = [];
-    const requiredSlots = Math.ceil(serviceDuration / 30);
+    const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
 
     for (const date in provider.schedule) {
       const { slots, status } = provider.schedule[date];

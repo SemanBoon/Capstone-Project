@@ -66,7 +66,6 @@ const UserHomePage = () => {
               <p>Service Provider: {appointment.serviceProvider.businessName}</p>
               <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
               <p>Time: {appointment.time}</p>
-              {/* <p>Time: {new Date(appointment.date).toLocaleDateString().setTime(appointment.time)}</p> */}
               <p>Description: {appointment.description}</p>
             </div>
           ))

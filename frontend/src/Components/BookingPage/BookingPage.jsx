@@ -11,6 +11,7 @@ const BookingPage = () => {
     const [services, setServices] = useState([]);
     const [selectedService, setSelectedService] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
+    const [recommendedSlots, setrecommendedSlots] = useState([])
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,13 +43,35 @@ const BookingPage = () => {
                     });
                     const data = await response.json();
                     setAvailableSlots(data);
-                } catch (error) {
+                    } catch (error) {
                     console.error('Error fetching available slots:', error);
                 }
             };
+
+            const fetchRecommendedSlots = async () => {
+                try {
+                    const response = await fetch('http://localhost:5174/get-recommended-slots', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            providerId,
+                            userId: user.id,
+                            serviceDuration: selectedService.duration,
+                        }),
+                    });
+                    const data = await response.json();
+                    setrecommendedSlots(data);
+                } catch (error) {
+                    console.error('Error fetching recommended slots:', error);
+                }
+            };
+
             fetchAvailableSlots();
+            fetchRecommendedSlots();
         }
-    }, [selectedService, providerId]);
+    }, [selectedService, providerId, user.id]);
 
 
     const handleBookAppointment = async () => {
@@ -79,8 +102,8 @@ const BookingPage = () => {
 
 
     const filterSlots = (slots) => {
-        if (!selectedService)
-            return [];
+        if (!selectedService|| !Array.isArray(slots))
+            return []
         const requiredSlots = Math.ceil(selectedService.duration / 30);
         return slots.filter(slot => {
             if (date && slot.date !== date)
@@ -142,6 +165,20 @@ const BookingPage = () => {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe the service"
                 />
+            </div>
+            <div className="recommended-slots">
+                <h2>Recommended Slots:</h2>
+                {recommendedSlots.length > 0 ? (
+                    <ul>
+                        {recommendedSlots.map((slot, index) => (
+                            <li key={index} onClick={() => handleSlotClick(slot)} style={{ cursor: 'pointer' }}>
+                                {slot.date} - {new Date(slot.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No recommended time slots available.</p>
+                )}
             </div>
             <div className="available-slots">
                 <h2>Available Slots:</h2>

@@ -754,7 +754,6 @@ const calculatePreferredTimeFromAppointments = (appointments) => {
 const calculateUtility = (slot, userPreference, provider, currentTime, weights, serviceDuration, preferredPeriod) => {
   const calculateUserPrefScore = (slot, userPreferences) => {
     const slotTime = new Date(slot.time).toTimeString().slice(0, 5);
-    // const slotTime = slot.time
     return userPreferences.includes(slotTime) ? 1 : 0;
   }
 

@@ -11,7 +11,7 @@ const BookingPage = () => {
     const [services, setServices] = useState([]);
     const [selectedService, setSelectedService] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
-    const [recommendedSlots, setrecommendedSlots] = useState([])
+    const [recommendedSlots, setRecommendedSlots] = useState([])
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -62,7 +62,7 @@ const BookingPage = () => {
                         }),
                     });
                     const data = await response.json();
-                    setrecommendedSlots(data);
+                    setRecommendedSlots(data);
                 } catch (error) {
                     console.error('Error fetching recommended slots:', error);
                 }

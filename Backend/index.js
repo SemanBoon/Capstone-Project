@@ -296,13 +296,19 @@ app.get('/provider-homepage/:id', async (req, res) => {
 
 //to create an appointment
 app.post('/create-appointment', async (req, res) => {
-  const { userId, providerId, date, time, description } = req.body;
+  const { userId, providerId, date, time, description, serviceId } = req.body;
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
+    }
+    const service = await prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
     }
 
     const newAppointment = await prisma.appointment.create({
@@ -326,8 +332,15 @@ app.post('/create-appointment', async (req, res) => {
         const slots = schedule.slots;
         const status = schedule.status;
         const slotIndex = slots.findIndex(slot => new Date(slot).toTimeString().slice(0, 5) === time);
+
+        const requiredSlots = Math.ceil(service.duration * 60 / 30);
+
         if (slotIndex !== -1) {
-          status[slotIndex] = 1; // Mark as booked
+          for (let i = 0; i < requiredSlots; i++) {
+            if (slotIndex + i < status.length) {
+              status[slotIndex + i] = 1; // Mark as booked
+            }
+          }
           const updatedSchedule = {
             ...provider.schedule,
             [date]: {
@@ -335,6 +348,7 @@ app.post('/create-appointment', async (req, res) => {
               status,
             },
           };
+
           await prisma.serviceProvider.update({
             where: { id: providerId },
             data: { schedule: updatedSchedule },
@@ -372,9 +386,7 @@ app.get('/service-provider-appointments/:providerId', async (req, res) => {
   try {
     const appointments = await prisma.appointment.findMany({
       where: { serviceProviderId: providerId },
-      include: {
-        user: true,
-      },
+      include: { user: true },
     });
     res.json(appointments);
   } catch (error) {
@@ -575,14 +587,14 @@ app.post('/get-available-slots', async (req, res) => {
     }
 
     const availableSlots = [];
-    const requiredSlots = Math.ceil(serviceDuration / 30);
+    const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
 
     for (const date in provider.schedule) {
       const { slots, status } = provider.schedule[date];
 
       for (let i = 0; i <= slots.length - requiredSlots; i++) {
         if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
-          availableSlots.push({ date, time: slots[i] });
+          availableSlots.push({ date, time: slots[i], status: status[i] });
         }
       }
     }

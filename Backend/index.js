@@ -6,14 +6,12 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const multer = require('multer');
 require('dotenv').config();
-
 const app = express();
 app.use(express.json());
 const prisma = new PrismaClient();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT || 5174;
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -474,14 +472,6 @@ app.get('/service-provider-profile/:id', async (req, res) => {
   }
 });
 
-// Fetch all reviews of a single service provider
-app.get('/service-provider-reviews', async (req, res) => {
-  const reviews = await prisma.review.findMany({
-    where: { serviceProviderId: req.query.id },
-  });
-  res.json(reviews);
-});
-
 // Upload photos and videos of service provider
 app.post('/upload-media', upload.single('file'), async (req, res) => {
   const file = req.file;
@@ -574,105 +564,116 @@ app.delete('/delete-service', async (req, res) => {
   }
 });
 
-//gets all available slots
+app.post('/add-favorite', async (req, res) => {
+  const { userId, providerId } = req.body;
+  try {
+    const favorite = await prisma.favorite.create({
+      data: {
+        userId,
+        serviceProviderId: providerId,
+      },
+    });
+    res.status(200).json(favorite);
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    res.status(500).json({ error: 'Failed to add favorite' });
+  }
+});
+
+// Endpoint to fetch a user's favorites
+app.get('/user-favorites/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId },
+      include: { serviceProvider: true },
+    });
+    res.status(200).json(favorites);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    res.status(500).json({ error: 'Failed to fetch favorites' });
+  }
+});
+
+app.post('/check-favorite', async (req, res) => {
+  const { userId, providerId } = req.body;
+  try {
+    const favorite = await prisma.favorite.findFirst({
+      where: {
+        userId,
+        serviceProviderId: providerId,
+      },
+    });
+    if (favorite) {
+      res.json({ isFavorite: true });
+    } else {
+      res.json({ isFavorite: false });
+    }
+  } catch (error) {
+    console.error('Error checking favorite:', error);
+    res.status(500).json({ error: 'Failed to check favorite' });
+  }
+});
+
 app.post('/get-available-slots', async (req, res) => {
   const { providerId, serviceDuration } = req.body;
   try {
-    const provider = await prisma.serviceProvider.findUnique({
-      where: { id: providerId },
-      select: { schedule: true },
-    });
-    if (!provider) {
-      return res.status(404).json({ error: 'Service provider not found' });
-    }
-    const availableSlots = [];
-    const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
-    for (const date in provider.schedule) {
-      const { slots, status } = provider.schedule[date];
-      for (let i = 0; i <= slots.length - requiredSlots; i++) {
-        if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
-          availableSlots.push({
-            date,
-            time: slots[i],
-            status: status[i] });
-        }
+      const provider = await prisma.serviceProvider.findUnique({
+          where: { id: providerId },
+          select: { schedule: true },
+      });
+      if (!provider) {
+              return res.status(404).json({ error: 'Service provider not found' });
       }
-    }
-    res.status(200).json(availableSlots);
-  } catch (error) {
-    console.error('Error fetching available slots:', error);
-    res.status(500).json({ error: 'Failed to fetch available slots' });
+      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {}); // Slot popularity passed as {}
+      res.status(200).json(availableSlots);
+      } catch (error) {
+      console.error('Error fetching available slots:', error);
+      res.status(500).json({ error: 'Failed to fetch available slots' });
   }
 });
-
-
-
-//TC2 RECOMMENDED TIME SLOT CODE BELOW..
 
 app.post('/get-recommended-slots', async (req, res) => {
-  const { providerId, userId, serviceDuration } = req.body;
+  const { providerId, userId, serviceDuration, userPriority, userTime } = req.body;
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId }, include: {appointments: true} });
-    const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
-    const currentTime = new Date();
+      const user = await prisma.user.findUnique({ where: { id: userId }, include: {appointments: true} });
+      const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
 
-    if (!user || !provider) {
-      return res.status(404).json({ error: 'User or Service Provider not found' });
-    }
+      if (!user || !provider) {
+          return res.status(404).json({ error: 'User or Service Provider not found' });
+      }
 
-    let userPreferences = [];
-    if (user.appointments.length > 0) {
-      userPreferences = calculateUserPreferences(user.appointments);
-    } else {
-      userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
-    }
+      let userPreferences = [];
+      if (user.appointments.length > 0) {
+          userPreferences = calculateUserPreferences(user.appointments);
+      } else {
+          userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
+      }
 
-    const preferredPeriod = calculatePreferredTimeFromAppointments(user.appointments);
-    const slotPopularity = await calculateSlotPopularity(providerId);
-    const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, slotPopularity);
-    const recommendedSlots = getRecommendedSlots(availableSlots, userPreferences, provider, currentTime, serviceDuration, preferredPeriod);
+      const preferredPeriod = calculatePreferredTimeFromAppointments(user.appointments);
+      const slotPopularity = await calculateSlotPopularity(providerId);
+      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, slotPopularity);
+      const weights = getUpdatedWeights(userPriority);
+      const recommendedSlots = getRecommendedSlots(availableSlots, userPreferences, provider, userTime || new Date(), serviceDuration, preferredPeriod, weights);
 
-    res.status(200).json(recommendedSlots);
-  } catch (error) {
-    console.error('Error fetching recommended slots:', error);
-    res.status(500).json({ error: 'Failed to fetch recommended slots' });
+      res.status(200).json(recommendedSlots);
+      } catch (error) {
+      console.error('Error fetching recommended slots:', error);
+      res.status(500).json({ error: 'Failed to fetch recommended slots' });
   }
 });
-
-const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
-  const availableSlots = [];
-  const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
-
-  for (const date in schedule) {
-    const { slots, status } = schedule[date];
-
-    for (let i = 0; i <= slots.length - requiredSlots; i++) {
-      if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
-        const slotTime = slots[i]
-        availableSlots.push({
-          date,
-          time: slotTime,
-          status: status[i],
-          popularity: slotPopularity[slotTime] || 0
-        });
-      }
-    }
-  }
-
-  return availableSlots;
-};
 
 const calculateSlotPopularity = async (providerId) => {
   try {
-    const bookings = await prisma.appointment.findMany({
-      where: { serviceProviderId: providerId },
-    });
+      const bookings = await prisma.appointment.findMany({
+          where: { serviceProviderId: providerId },
+      });
 
-    const slotCount = {};
-    const totalBookings = bookings.length;
+      const slotCount = {};
+      const totalBookings = bookings.length;
 
-    bookings.forEach(booking => {
-      const slotTime = booking.time;
+      bookings.forEach(booking => {
+          const slotTime = booking.time;
       if (slotCount[slotTime]) {
         slotCount[slotTime]++;
       } else {
@@ -693,18 +694,72 @@ const calculateSlotPopularity = async (providerId) => {
 };
 
 
-const getRecommendedSlots = (slots, userPreferences, provider, currentTime, serviceDuration, preferredPeriod) => {
-  const weights = {
-    user_preferences: 0.15,
-    preferred_time_of_day: 0.25,
-    time_slot_popularity: 0.1,
-    current_time_proximity: 0.2,
-    focus_periods: 0.3
-  };
+const getUpdatedWeights = (priority) => {
+  switch (priority) {
+      case 'focus_block':
+          return {
+            user_preferences: 0.2,
+            preferred_time_of_day: 0.2,
+            time_slot_popularity: 0.2,
+            current_time_proximity: 0.2,
+            focus_periods: 0.4, // Focus block gets the highest weight
+          };
+      case 'user_preferred_time':
+          return {
+              user_preferences: 0.2,
+              preferred_time_of_day: 0.4, // User preferred time gets the highest weight
+              time_slot_popularity: 0.2,
+              current_time_proximity: 0.2,
+              focus_periods: 0.2,
+          };
+      case 'popular_slots':
+          return {
+              user_preferences: 0.2,
+              preferred_time_of_day: 0.2,
+              time_slot_popularity: 0.4, // Popular slots get the highest weight
+              current_time_proximity: 0.2,
+              focus_periods: 0.2,
+          };
+      default:
+          return {
+              user_preferences: 0.15,
+              preferred_time_of_day: 0.25,
+              time_slot_popularity: 0.1,
+              current_time_proximity: 0.2,
+              focus_periods: 0.3,
+          };
+  }
+};
 
+const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
+  const availableSlots = [];
+  const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
+  // service.duration unit is hours.
+  // For 30 mins, it will be 0.5 * 60/ 30 = 1, in this case required slots is 1
+  // For 2 hours, it will be 2 * 60/30 = 4, in this case required slots is 4
+
+  for (const date in schedule) {
+    const { slots, status } = schedule[date];
+
+    for (let i = 0; i <= slots.length - requiredSlots; i++) {
+      if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
+        const slotTime = slots[i]
+        availableSlots.push({
+          date,
+          time: slotTime,
+          status: status[i],
+          popularity: slotPopularity[slotTime] || 0
+        });
+      }
+    }
+  }
+  return availableSlots;
+};
+
+const getRecommendedSlots = (slots, userPreferences, provider, currentTime, serviceDuration, preferredPeriod, weights) => {
   return slots.map(slot => ({
-    ...slot,
-    score: calculateUtility(slot, userPreferences, provider, currentTime, weights, serviceDuration, preferredPeriod)
+      ...slot,
+      score: calculateUtility(slot, userPreferences, provider, currentTime, weights, serviceDuration, preferredPeriod)
   })).sort((a, b) => b.score - a.score).slice(0, 5); // Return top 5 recommended slots
 };
 
@@ -712,12 +767,12 @@ const calculateUserPreferences = (bookings) => {
   const timeCount = {};
 
   bookings.forEach(booking => {
-    const slotTime = new Date(booking.time).toTimeString().slice(0, 5);
-    if (timeCount[slotTime]) {
-      timeCount[slotTime]++;
-    } else {
-      timeCount[slotTime] = 1;
-    }
+      const slotTime = new Date(booking.time).toTimeString().slice(0, 5);
+      if (timeCount[slotTime]) {
+          timeCount[slotTime]++;
+      } else {
+          timeCount[slotTime] = 1;
+      }
   });
 
   // Sort times by frequency
@@ -746,76 +801,75 @@ const calculatePreferredTimeFromAppointments = (appointments) => {
   const preferredPeriod = Object.keys(timeCounts).reduce((a, b) =>
     timeCounts[a] > timeCounts[b] ? a : b
   );
-
   return preferredPeriod;
 };
 
 
 const calculateUtility = (slot, userPreference, provider, currentTime, weights, serviceDuration, preferredPeriod) => {
   const calculateUserPrefScore = (slot, userPreferences) => {
-    const slotTime = new Date(slot.time).toTimeString().slice(0, 5);
-    return userPreferences.includes(slotTime) ? 1 : 0;
+      const slotTime = new Date(slot.time).toTimeString().slice(0, 5);
+      return userPreferences.includes(slotTime) ? 1 : 0;
   }
 
   const calculateFocusPeriodScore = (slot, provider, serviceDuration) => {
-    const dateSchedule = provider.schedule[slot.date];
-    if (!dateSchedule)
-      return 0;
+      const dateSchedule = provider.schedule[slot.date];
+      if (!dateSchedule)
+          return 0;
 
-    const slots = dateSchedule.slots;
-    const status = dateSchedule.status;
-    const slotIndex = slots.findIndex(s => new Date(s).toTimeString().slice(0, 5) === new Date(slot.time).toTimeString().slice(0, 5));
+      const slots = dateSchedule.slots;
+      const status = dateSchedule.status;
+      const slotIndex = slots.findIndex(s => new Date(s).toTimeString().slice(0, 5) === new Date(slot.time).toTimeString().slice(0, 5));
 
-    if (slotIndex === -1 || status[slotIndex] !== 0)
-      return 0;
+      if (slotIndex === -1 || status[slotIndex] !== 0)
+          return 0;
 
-    const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
+      const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
 
-    for (let i = 0; i < requiredSlots; i++) {
-      if (slotIndex + i >= status.length || status[slotIndex + i] !== 0) {
-        return 0;
+      for (let i = 0; i < requiredSlots; i++) {
+          if (slotIndex + i >= status.length || status[slotIndex + i] !== 0) {
+              return 0;
+          }
       }
-    }
 
-    const startFocusSlot = slotIndex - 1;
-    const endFocusSlot = slotIndex + requiredSlots;
+      const startFocusSlot = slotIndex - 1;
+      const endFocusSlot = slotIndex + requiredSlots;
 
-    // Check if there are booked slots immediately before or after the current slot
-    const beforeFocus = startFocusSlot >= 0 && status[startFocusSlot] === 1;
-    const afterFocus = endFocusSlot < status.length && status[endFocusSlot] === 1;
+      // Check if there are booked slots immediately before or after the current slot
+      const beforeFocus = startFocusSlot >= 0 && status[startFocusSlot] === 1;
+      const afterFocus = endFocusSlot < status.length && status[endFocusSlot] === 1;
 
-    return beforeFocus || afterFocus ? 1 : 0;
+      return beforeFocus || afterFocus ? 1 : 0;
   };
 
   const calculatePreferredTimeScore = (slot, preferredPeriod) => {
-    const hour = new Date(slot.time).getHours();
-    if (preferredPeriod === 'morning' && hour >= 8 && hour < 12)
-      return 1;
-    if (preferredPeriod === 'afternoon' && hour >= 12 && hour < 16)
-      return 1;
-    if (preferredPeriod === 'evening' && hour >= 16 && hour < 22)
-      return 1;
-    return 0;
+      const hour = new Date(slot.time).getHours();
+      if (preferredPeriod === 'morning' && hour >= 8 && hour < 12)
+          return 1;
+      if (preferredPeriod === 'afternoon' && hour >= 12 && hour < 16)
+          return 1;
+      if (preferredPeriod === 'evening' && hour >= 16 && hour < 22)
+          return 1;
+      return 0;
   };
 
   //higher the proximity score, closer slot is to current time
   const calculateProximityScore = (slot, currentTime) => {
-    const slotTime = new Date(slot.time);
-    const currentDate = currentTime.toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-    const slotDate = slotTime.toISOString().split('T')[0]; // Slot date in YYYY-MM-DD format
+      const slotTime = new Date(slot.time);
+      const currentDate = currentTime.toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+      const slotDate = slotTime.toISOString().split('T')[0]; // Slot date in YYYY-MM-DD format
 
-    const dateDiff = (new Date(slotDate) - new Date(currentDate)) / (24 * 60 * 60 * 1000); // converts result to days
-    const timeDiff = Math.abs(slotTime.getTime() - currentTime.getTime()) / (60 * 60 * 1000); // converts results to hours
+      const dateDiff = (new Date(slotDate) - new Date(currentDate)) / (24 * 60 * 60 * 1000); // converts result to days
+      const timeDiff = Math.abs(slotTime.getTime() - currentTime.getTime()) / (60 * 60 * 1000); // converts results to hours
 
-    const totalTimeDiff = (Math.abs(dateDiff) * 24) + timeDiff; // Convert dateDiff to hours and add timeDiffInSameDay and combines them to get total time diff
+      const totalTimeDiff = (Math.abs(dateDiff) * 24) + timeDiff; // Convert dateDiff to hours and add timeDiffInSameDay and combines them to get total time diff
 
-    const maxTimeDiff = 7 * 24; // 168 (Maximum difference is 7 days (1 week) in hours)
+      const maxTimeDiff = 7 * 24; // 168 (Maximum difference is 7 days (1 week) in hours)
 
-    return 1 - (totalTimeDiff / maxTimeDiff);
+      return 1 - (totalTimeDiff / maxTimeDiff);
   };
 
   const calculatePopularityScore = (slot) => {
-    return 1 - slot.popularity;
+      return 1 - slot.popularity;
   };
 
   const userPrefScore = calculateUserPrefScore(slot, userPreference);

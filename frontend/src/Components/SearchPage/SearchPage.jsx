@@ -7,11 +7,11 @@ const SearchPage = () => {
   const locationState = useLocation();
   const userAddress = locationState?.state?.userAddress || '';
   const [location, setLocation] = useState('');
-  const navigate = useNavigate();
   const [serviceProviders, setServiceProviders] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchServiceProviders(userAddress);

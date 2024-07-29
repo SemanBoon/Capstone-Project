@@ -9,7 +9,7 @@ const UserWebSocket = ({ userId }) => {
     const connectWebSocket = () => {
       const socket = new WebSocket(`ws://localhost:5174/ws/${userId}`);
       socket.onopen = () => {
-        console.log(`WebSocket connection established for user ${userId}`);
+        console.log(`WebSocket connection established for user ${userId}`); //this concole.log is essential because it shows me that the websocket connection is established.
       };
       socket.onmessage = (event) => {
         try {
@@ -26,8 +26,8 @@ const UserWebSocket = ({ userId }) => {
       };
 
       socket.onclose = (event) => {
-        console.log('WebSocket connection closed:', event);
-        console.log('Reconnecting in 3 seconds...');
+        console.log('WebSocket connection closed:', event); //this concole.log is essential because it shows me that the websocket connection is closed.
+        console.log('Reconnecting in 3 seconds...'); //this concole.log is essential because it shows me that the websocket connection is tries to recconect every 3 seconds after timeout
         setTimeout(connectWebSocket, 3000);
       };
 

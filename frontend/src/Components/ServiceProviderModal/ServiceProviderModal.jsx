@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../UserContext';
 import {
   APIProvider,
   Map,
@@ -8,18 +9,20 @@ import {
   Pin,
   InfoWindow,
 } from "@vis.gl/react-google-maps";
-import { UserContext } from '../../UserContext';
+
 
 const apiKey = 'AIzaSyBwyPWvQIc3BM2Pe5EeL1WhGOLof06bb7g';
 
 const ServiceProviderModal = ({ show, handleClose, provider }) => {
     const [services, setServices] = useState([]);
-    const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(false);
     const { user } = useContext(UserContext)
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (provider && provider.id) {
             fetchServices(provider.id);
+            checkFavoriteStatus(provider.id);
         }
     }, [provider]);
 
@@ -33,6 +36,54 @@ const ServiceProviderModal = ({ show, handleClose, provider }) => {
             setServices(data || []);
           } catch (error) {
             console.error('Error fetching services:', error);
+        }
+    };
+
+    const checkFavoriteStatus = async (providerId) => {
+        try {
+            const response = await fetch('http://localhost:5174/check-favorite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    providerId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.isFavorite) {
+                setIsFavorite(true);
+            } else {
+                setIsFavorite(false);
+            }
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
+        }
+    };
+
+    const handleAddToFavorites = async () => {
+        if (isFavorite) return;
+        try {
+            const response = await fetch('http://localhost:5174/add-favorite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    providerId: provider.id,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add favorite');
+            }
+            setIsFavorite(true);
+        } catch (error) {
+            console.error('Error adding favorite:', error);
         }
     };
 
@@ -114,9 +165,11 @@ const ServiceProviderModal = ({ show, handleClose, provider }) => {
             )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>Close</Button>
-          <Button variant="primary" onClick={handleBookAppointment}>Book Appointment</Button>
-          <Button variant="success">Add to Favorites</Button>
+            <Button variant="secondary" onClick={handleClose}>Close</Button>
+            <Button variant="primary" onClick={handleBookAppointment}>Book Appointment</Button>
+            <Button variant="success" onClick={handleAddToFavorites} disabled={isFavorite} >
+                {isFavorite ? "Added to Favorites" : "Add to Favorites"}
+            </Button>
         </Modal.Footer>
       </Modal>
     );

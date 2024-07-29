@@ -15,8 +15,8 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
 
   const [initialData, setInitialData] = useState({});
   const { updateUser } = useContext(UserContext);
-  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
@@ -78,7 +78,6 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           const loginData = await loginResponse.json();
           localStorage.setItem("user", JSON.stringify(loginData));
           updateUser(loginData);
-          // navigate(loginData.redirectTo);
           navigate(`/provider-homepage/${loginData.id}`)
         } else {
           setErrorMessage("Login Failed");

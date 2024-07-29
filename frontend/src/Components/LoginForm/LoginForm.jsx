@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import SelectProfileModal from "../SelectProfileModal/SelectProfileModal";
 import "./LoginForm.css";
 
-
 const LoginForm = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -15,10 +14,12 @@ const LoginForm = () => {
 
   const handleChangePassword = (e) => {
     setUserPassword(e.target.value);
+    setErrorMessage('');
   };
 
   const handleChangeEmail = (e) => {
     setUserEmail(e.target.value);
+    setErrorMessage('');
   };
 
   const validateEmail = (email) => {

@@ -12,6 +12,7 @@ const BookingPage = () => {
     const [selectedService, setSelectedService] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
     const [recommendedSlots, setRecommendedSlots] = useState([])
+    const [userPriority, setUserPriority] = useState('focus_block'); // New state for user priority
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,6 +60,8 @@ const BookingPage = () => {
                             providerId,
                             userId: user.id,
                             serviceDuration: selectedService.duration,
+                            userPriority,
+                            userTime: time,
                         }),
                     });
                     const data = await response.json();
@@ -67,11 +70,10 @@ const BookingPage = () => {
                     console.error('Error fetching recommended slots:', error);
                 }
             };
-
             fetchAvailableSlots();
             fetchRecommendedSlots();
         }
-    }, [selectedService, providerId, user.id]);
+    }, [selectedService, providerId, user.id, userPriority, time]);
 
 
     const handleBookAppointment = async () => {
@@ -139,6 +141,14 @@ const BookingPage = () => {
                             {service.name} - ${service.price}
                         </option>
                     ))}
+                </select>
+            </div>
+            <div className="form-group">
+                <label htmlFor="priority">What is your biggest priority in finding a booking slot:</label>
+                <select id="priority" value={userPriority} onChange={(e) => setUserPriority(e.target.value)}>
+                    <option value="focus_block">Focus Block</option>
+                    <option value="user_preferred_time">User Preferred Time</option>
+                    <option value="popular_slots">Popular Slots</option>
                 </select>
             </div>
             <div className="form-group">

@@ -8,7 +8,6 @@ const ProviderHomePage = () => {
     const { id } = useParams();
     const [appointments, setAppointments] = useState([]);
     const [profile, setProfile] = useState({});
-    const [reviews, setReviews] = useState([]);
     const [media, setMedia] = useState([]);
     const [services, setServices] = useState([]);
     const [schedules, setSchedules] = useState({});
@@ -21,7 +20,6 @@ const ProviderHomePage = () => {
     useEffect(() => {
         fetchAppointments();
         fetchProfile();
-        fetchReviews();
         fetchServices();
         fetchSchedules();
     }, []);
@@ -49,19 +47,6 @@ const ProviderHomePage = () => {
             const data = await response.json();
             setProfile(data);
         }   catch (error) {
-            console.error(error);
-        }
-    };
-
-    const fetchReviews = async () => {
-        try {
-            const response = await fetch(`http://localhost:5174/service-provider-reviews?id=${id}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch reviews");
-            }
-            const data = await response.json();
-            setReviews(data);
-        } catch (error) {
             console.error(error);
         }
     };
@@ -222,19 +207,6 @@ const ProviderHomePage = () => {
                     ))) : ( <p>You have no media files.</p>)
                     }
                 </div>
-            </section>
-            <section>
-                <h2>Reviews</h2>
-                {reviews.length > 0 ? (
-                    reviews.map(review => (
-                        <div key={review.id}>
-                            <p>Customer: {review.customerName}</p>
-                            <p>{review.text}</p>
-                            <p>Rating: {review.rating}</p>
-                        </div>
-                    ))) : (<p>You have no reviews available to show.</p>)
-                    }
-                {reviews.length > 0 && <button>View More Reviews</button>}
             </section>
             <section>
                 <h2>Your Services</h2>

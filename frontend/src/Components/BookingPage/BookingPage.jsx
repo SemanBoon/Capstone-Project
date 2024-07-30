@@ -44,11 +44,8 @@ const BookingPage = () => {
                     });
                     const data = await response.json();
                     setAvailableSlots(data);
-                    console.log(data)
                     } catch (error) {
                     console.error('Error fetching available slots:', error);
-                    console.log("Available Slots Calculation:", { slots, requiredSlots });
-
                 }
             };
 
@@ -109,7 +106,6 @@ const BookingPage = () => {
         if (!selectedService|| !Array.isArray(slots))
             return []
         const requiredSlots = Math.ceil(selectedService.duration  / 30);
-        console.log(requiredSlots)
         return slots.filter(slot => {
             if (date && slot.date !== date)
                 return false;
@@ -137,7 +133,6 @@ const BookingPage = () => {
     };
 
     const filteredSlots = filterSlots(availableSlots);
-    console.log("avail", availableSlots)
 
     const handleSlotClick = (slot) => {
         setDate(slot.date);

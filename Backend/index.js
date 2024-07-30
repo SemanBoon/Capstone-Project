@@ -1,4 +1,5 @@
-const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, calculateUtility } = require('./utils.js');
+
+const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const http = require('http');

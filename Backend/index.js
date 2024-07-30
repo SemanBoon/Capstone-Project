@@ -627,10 +627,8 @@ app.post('/get-available-slots', async (req, res) => {
         return res.status(404).json({ error: 'Service provider not found' });
       }
       const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {});
-      console.log(provider.schedule)
        // Slot popularity passed as {}
       res.status(200).json(availableSlots);
-      console.log(availableSlots)
       } catch (error) {
       console.error('Error fetching available slots:', error);
       res.status(500).json({ error: 'Failed to fetch available slots' });

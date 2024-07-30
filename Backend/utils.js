@@ -38,24 +38,21 @@ const getUpdatedWeights = (priority) => {
 const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
     const availableSlots = [];
     const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
-    // service.duration unit is hours.
-    // For 30 mins, it will be 0.5 * 60/ 30 = 1, in this case required slots is 1
-    // For 2 hours, it will be 2 * 60/30 = 4, in this case required slots is 4
-
+    
     for (const date in schedule) {
-      const { slots, status } = schedule[date];
+        const { slots, status } = schedule[date];
 
-      for (let i = 0; i <= slots.length - requiredSlots; i++) {
-        if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
-          const slotTime = slots[i]
-          availableSlots.push({
-            date,
-            time: slotTime,
-            status: status[i],
-            popularity: slotPopularity[slotTime] || 0
-          });
+        for (let i = 0; i <= slots.length - requiredSlots; i++) {
+            if (status.slice(i, i + requiredSlots).every(s => s === 0)) {
+                const slotTime = slots[i]
+                availableSlots.push({
+                    date,
+                    time: slotTime,
+                    status: status[i],
+                    popularity: slotPopularity[slotTime] || 0
+                });
+            }
         }
-      }
     }
     return availableSlots;
 };
@@ -157,20 +154,31 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
     };
 
     //higher the proximity score, closer slot is to current time
-    const calculateProximityScore = (slot, currentTime) => {
+
+    const calculateProximityScore = (slot, userTime) => {
+        if (!userTime) return 0; // If user didn't enter a time, return 0
+
         const slotTime = new Date(slot.time);
-        const currentDate = currentTime.toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-        const slotDate = slotTime.toISOString().split('T')[0]; // Slot date in YYYY-MM-DD format
+        const enteredTime = new Date(userTime);
 
-        const dateDiff = (new Date(slotDate) - new Date(currentDate)) / (24 * 60 * 60 * 1000); // converts result to days
-        const timeDiff = Math.abs(slotTime.getTime() - currentTime.getTime()) / (60 * 60 * 1000); // converts results to hours
+        // Extract only the time components
+        const slotHours = slotTime.getHours();
+        const slotMinutes = slotTime.getMinutes();
+        const enteredHours = enteredTime.getHours();
+        const enteredMinutes = enteredTime.getMinutes();
 
-        const totalTimeDiff = (Math.abs(dateDiff) * 24) + timeDiff; // Convert dateDiff to hours and add timeDiffInSameDay and combines them to get total time diff
+        // Calculate the time difference in minutes
+        const slotTotalMinutes = slotHours * 60 + slotMinutes;
+        const enteredTotalMinutes = enteredHours * 60 + enteredMinutes;
 
-        const maxTimeDiff = 7 * 24; // 168 (Maximum difference is 7 days (1 week) in hours)
+        const timeDiff = Math.abs(slotTotalMinutes - enteredTotalMinutes); // Difference in minutes
+        const maxTimeDiff = 12 * 60; // 12 hours converted to minutes
 
-        return 1 - (totalTimeDiff / maxTimeDiff);
+        // Return the score based on the closeness to the desired time
+        return 1 - (timeDiff / maxTimeDiff);
     };
+
+
 
     const calculatePopularityScore = (slot) => {
         return 1 - slot.popularity;

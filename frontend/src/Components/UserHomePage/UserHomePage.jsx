@@ -47,22 +47,36 @@ const UserHomePage = () => {
 
   return (
     <>
+    <NavBar/>
+    <div className="main-content">
       <div className="homepage-header">
         <h1>Welcome to the SheBraids, {user.name}!</h1>
         <h3>Find Your Perfect Match</h3>
       </div>
-      <div className = "container">
-        <div className="braid-section"onClick={() => handleCategoryClick('Braids')}>BRAIDS</div>
-        <div className="haircut-section"onClick={() => handleCategoryClick('Haircuts')}>HAIRCUTS</div>
-        <div className="weave-section"onClick={() => handleCategoryClick('Weave and Installs')}>WEAVE AND INSTALLS</div>
-        <div className="locs-section"onClick={() => handleCategoryClick('Locs')}>LOCS</div>
+      <div className = "home-container">
+      <div className="category-section braid-section" onClick={() => handleCategoryClick('Braids')}>
+          <div className="tooltip">Discover beautiful braids styles</div>
+          BRAIDS
+        </div>
+        <div className="category-section haircut-section" onClick={() => handleCategoryClick('Haircuts')}>
+          <div className="tooltip">Explore stylish haircuts</div>
+          HAIRCUTS
+        </div>
+        <div className="category-section weave-section" onClick={() => handleCategoryClick('Weave and Installs')}>
+          <div className="tooltip">Find the perfect wig installs</div>
+          WIG INSTALLS
+        </div>
+        <div className="category-section locs-section" onClick={() => handleCategoryClick('Locs')}>
+          <div className="tooltip">Get the best locs styles</div>
+          LOCS
+        </div>
       </div>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
       <section>
         <h2>Upcoming Bookings</h2>
         {appointments.length > 0 ? (
           appointments.map(appointment => (
-            <div key={appointment.id}>
+            <div key={appointment.id} className="appointment-card">
               <p>Service Provider: {appointment.serviceProvider.businessName}</p>
               <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
               <p>Time: {appointment.time}</p>
@@ -73,8 +87,8 @@ const UserHomePage = () => {
           <p>No upcoming bookings</p>
         )}
       </section>
-      <NavBar/>
       <button onClick={handleLogout} className="logout-button">Log Out</button>
+      </div>
     </>
   );
 };

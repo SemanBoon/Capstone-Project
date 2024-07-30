@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import ServiceProviderModal from '../ServiceProviderModal/ServiceProviderModal';
+import "./SearchPage.css";
 
 const SearchPage = () => {
   const { category } = useParams();
@@ -65,26 +66,29 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="search-page">
-        <h2>Search {category}</h2>
-        <div>
+    <div className="user-search-page">
+       <button onClick={handleBack} className="searchpage-back-button">Back</button>
+        <h1 className="search-title">Search {category}</h1>
+        <div className = "user-search-container">
             <input
               type="text"
               value={location}
               onChange={handleLocationChange}
               placeholder="Enter city, state, or zip code"
+              className='search-input'
             />
-          <button onClick={handleSearch}>Search</button>
-          <button onClick={handleClear}>Clear</button>
-          <button onClick={handleBack}>Back</button>
+          <div className="search-button-container">
+          <button onClick={handleSearch} className='search-button'>Search</button>
+          <button onClick={handleClear} className="clear-button">Clear</button>
+          </div>
         </div>
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <div className="service-provider-list">
             {hasSearched && serviceProviders.length === 0 ? (
               <p>No service provider found, try entering a different location</p>
         ) : (
-        serviceProviders.map((provider) => (
-            <div key={provider.id} className="service-provider" onClick={() => handleProviderClick(provider)}>
+          serviceProviders.map((provider) => (
+            <div key={provider.id} className="service-provider-card" onClick={() => handleProviderClick(provider)}>
               <h3>{provider.businessName}</h3>
               <p>{provider.bio}</p>
               <p>Distance: {provider.distance} meters</p>

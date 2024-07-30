@@ -621,13 +621,14 @@ app.post('/get-available-slots', async (req, res) => {
   const { providerId, serviceDuration } = req.body;
   try {
       const provider = await prisma.serviceProvider.findUnique({
-          where: { id: providerId },
-          select: { schedule: true },
+        where: { id: providerId },
+        select: { schedule: true },
       });
       if (!provider) {
-              return res.status(404).json({ error: 'Service provider not found' });
+        return res.status(404).json({ error: 'Service provider not found' });
       }
-      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {}); // Slot popularity passed as {}
+      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {});
+       // Slot popularity passed as {}
       res.status(200).json(availableSlots);
       } catch (error) {
       console.error('Error fetching available slots:', error);
@@ -642,14 +643,14 @@ app.post('/get-recommended-slots', async (req, res) => {
       const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
 
       if (!user || !provider) {
-          return res.status(404).json({ error: 'User or Service Provider not found' });
+        return res.status(404).json({ error: 'User or Service Provider not found' });
       }
 
       let userPreferences = [];
       if (user.appointments.length > 0) {
-          userPreferences = calculateUserPreferences(user.appointments);
+        userPreferences = calculateUserPreferences(user.appointments);
       } else {
-          userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
+        userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
       }
 
       const preferredPeriod = calculatePreferredTimeFromAppointments(user.appointments);
@@ -668,14 +669,14 @@ app.post('/get-recommended-slots', async (req, res) => {
 const calculateSlotPopularity = async (providerId) => {
   try {
       const bookings = await prisma.appointment.findMany({
-          where: { serviceProviderId: providerId },
+        where: { serviceProviderId: providerId },
       });
 
       const slotCount = {};
       const totalBookings = bookings.length;
 
       bookings.forEach(booking => {
-          const slotTime = booking.time;
+        const slotTime = booking.time;
       if (slotCount[slotTime]) {
         slotCount[slotTime]++;
       } else {

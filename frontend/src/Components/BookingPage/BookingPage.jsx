@@ -102,14 +102,26 @@ const BookingPage = () => {
         }
     };
 
-
     const filterSlots = (slots) => {
         if (!selectedService|| !Array.isArray(slots))
             return []
-        const requiredSlots = Math.ceil(selectedService.duration / 30);
+        const requiredSlots = Math.ceil(selectedService.duration  / 30);
         return slots.filter(slot => {
             if (date && slot.date !== date)
                 return false;
+            if (time) {
+                // Only filter based on time if time is provided
+                const enteredTime = new Date(`${slot.date}T${time}`);
+                const slotTime = new Date(slot.time);
+
+                // Check if the slot time is within a 30-minute range of the entered time
+                const diff = Math.abs(slotTime.getTime() - enteredTime.getTime());
+                if (diff <= 30 * 60 * 1000) {
+                    return true; // Include slots within the time range
+                } else {
+                    return false; // doesn't include slots outside the time range
+                }
+            }
             const slotIndex = slots.findIndex(s => s.time === slot.time);
             for (let i = 0; i < requiredSlots; i++) {
                 if (slotIndex + i >= slots.length || slots[slotIndex + i].status !== 0) {

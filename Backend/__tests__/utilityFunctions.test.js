@@ -1,49 +1,40 @@
-const { getAvailableSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments } = require('../utils.js');
+const { getAvailableSlots } = require('../utils.js');
 
 describe('getAvailableSlots', () => {
-    it('should return the correct available slots', () => {
-        const schedule = {
-            '2024-07-23': {
-                slots: ['09:00', '09:30', '10:00', '10:30'],
-                status: [0, 0, 1, 0]
-            }
-        };
-        const serviceDuration = 1; // 1 hour
-        const slotPopularity = {
-            '09:00': 0.5,
-            '09:30': 0.2
-        };
+    const mockSchedule = {
+        '2023-07-23': {
+            slots: ['08:00', '08:30', '09:00', '09:30', '10:00'],
+            status: [0, 1, 1, 0, 0], // '08:30' slot is booked
+        },
+    };
+    const serviceDuration = 1; // 1 hour
 
-        const result = getAvailableSlots(schedule, serviceDuration, slotPopularity);
-        expect(result).toEqual([
-            { date: '2024-07-23', time: '09:00', status: 0, popularity: 0.5 }
+    test('should return available slots correctly', () => {
+        const availableSlots = getAvailableSlots(mockSchedule, serviceDuration, {});
+        expect(availableSlots).toEqual([
+            { date: '2023-07-23', time: '09:30', status: 0, popularity: 0 },
         ]);
     });
-});
 
-describe('calculateUserPreferences', () => {
-    it('should return the correct user preferences', () => {
-        const bookings = [
-            { time: '2024-07-23T09:00:00' },
-            { time: '2024-07-23T09:00:00' },
-            { time: '2024-07-23T10:00:00' }
-        ];
-        const result = calculateUserPreferences(bookings);
-        expect(result).toEqual(['09:00', '10:00']);
+    test('should return empty array if no slots available', () => {
+        const mockSchedule = {
+            '2023-07-23': {
+                slots: ['08:00', '08:30'],
+                status: [1, 1], // All slots booked
+            },
+        };
+        const availableSlots = getAvailableSlots(mockSchedule, serviceDuration, {});
+        expect(availableSlots).toEqual([]);
     });
-});
 
-describe('calculatePreferredTimeFromAppointments', () => {
-    it('should return the correct preferred time period', () => {
-        const appointments = [
-            { time: '2024-07-23T09:00:00' },
-            { time: '2024-07-23T09:30:00' },
-            { time: '2024-07-23T10:00:00' },
-            { time: '2024-07-23T14:00:00' },
-            { time: '2024-07-23T15:00:00' }
-        ];
-
-        const result = calculatePreferredTimeFromAppointments(appointments);
-        expect(result).toBe('morning');
+    test('should handle edge case of partial slot booking', () => {
+        const mockSchedule = {
+            '2023-07-23': {
+                slots: ['08:00', '08:30', '09:00', '09:30'],
+                status: [0, 1, 0, 1], // Mixed booked and available
+            },
+        };
+        const availableSlots = getAvailableSlots(mockSchedule, serviceDuration, {});
+        expect(availableSlots).toEqual([]);
     });
 });

@@ -38,7 +38,7 @@ const getUpdatedWeights = (priority) => {
 const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
     const availableSlots = [];
     const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
-    
+
     for (const date in schedule) {
         const { slots, status } = schedule[date];
 

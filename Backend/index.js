@@ -1,4 +1,4 @@
-const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, calculateUtility } = require('./utils.js');
+const { getAvailableSlots } = require('./utils.js');
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const http = require('http');
@@ -626,8 +626,7 @@ app.post('/get-available-slots', async (req, res) => {
       if (!provider) {
         return res.status(404).json({ error: 'Service provider not found' });
       }
-      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {});
-       // Slot popularity passed as {}
+      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {}); // Slot popularity passed as {}
       res.status(200).json(availableSlots);
       } catch (error) {
       console.error('Error fetching available slots:', error);
@@ -638,30 +637,30 @@ app.post('/get-available-slots', async (req, res) => {
 app.post('/get-recommended-slots', async (req, res) => {
   const { providerId, userId, serviceDuration, userPriority, userTime } = req.body;
   try {
-      const user = await prisma.user.findUnique({ where: { id: userId }, include: {appointments: true} });
-      const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
+    const user = await prisma.user.findUnique({ where: { id: userId }, include: {appointments: true} });
+    const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
 
-      if (!user || !provider) {
-        return res.status(404).json({ error: 'User or Service Provider not found' });
-      }
+    if (!user || !provider) {
+      return res.status(404).json({ error: 'User or Service Provider not found' });
+    }
 
-      let userPreferences = [];
-      if (user.appointments.length > 0) {
-        userPreferences = calculateUserPreferences(user.appointments);
-      } else {
-        userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
-      }
+    let userPreferences = [];
+    if (user.appointments.length > 0) {
+       userPreferences = calculateUserPreferences(user.appointments);
+    } else {
+      userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
+    }
 
-      const preferredPeriod = calculatePreferredTimeFromAppointments(user.appointments);
-      const slotPopularity = await calculateSlotPopularity(providerId);
-      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, slotPopularity);
-      const weights = getUpdatedWeights(userPriority);
-      const recommendedSlots = getRecommendedSlots(availableSlots, userPreferences, provider, userTime || new Date(), serviceDuration, preferredPeriod, weights);
+    const preferredPeriod = calculatePreferredTimeFromAppointments(user.appointments);
+    const slotPopularity = await calculateSlotPopularity(providerId);
+    const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, slotPopularity);
+    const weights = getUpdatedWeights(userPriority);
+    const recommendedSlots = getRecommendedSlots(availableSlots, userPreferences, provider, userTime || new Date(), serviceDuration, preferredPeriod, weights);
 
-      res.status(200).json(recommendedSlots);
-      } catch (error) {
-      console.error('Error fetching recommended slots:', error);
-      res.status(500).json({ error: 'Failed to fetch recommended slots' });
+    res.status(200).json(recommendedSlots);
+    } catch (error) {
+    console.error('Error fetching recommended slots:', error);
+    res.status(500).json({ error: 'Failed to fetch recommended slots' });
   }
 });
 
@@ -687,7 +686,6 @@ const calculateSlotPopularity = async (providerId) => {
     Object.keys(slotCount).forEach(slotTime => {
       slotPopularity[slotTime] = slotCount[slotTime] / totalBookings;
     });
-
     return slotPopularity;
   } catch (error) {
     console.error('Error calculating slot popularity:', error);

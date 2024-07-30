@@ -191,4 +191,4 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
     );
 };
 
-module.exports = { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights}
+module.exports = { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, categorizeAppointmentTime }

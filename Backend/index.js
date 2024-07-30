@@ -1,3 +1,4 @@
+
 const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
@@ -693,5 +694,3 @@ const calculateSlotPopularity = async (providerId) => {
     return {};
   }
 };
-
-

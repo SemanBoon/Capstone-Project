@@ -69,7 +69,6 @@ const BookingPage = () => {
                             userTime: time,
                         }),
                     });
-                    console.log("priority", userPriority)
                     const data = await response.json();
                     if (Array.isArray(data)) {
                         setRecommendedSlots(data);

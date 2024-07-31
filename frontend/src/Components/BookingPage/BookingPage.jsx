@@ -12,7 +12,7 @@ const BookingPage = () => {
     const [selectedService, setSelectedService] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
     const [recommendedSlots, setRecommendedSlots] = useState([])
-    const [userPriority, setUserPriority] = useState('focus_block'); // New state for user priority
+    const [userPriority, setUserPriority] = useState(''); // New state for user priority
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -69,6 +69,7 @@ const BookingPage = () => {
                             userTime: time,
                         }),
                     });
+                    console.log("priority", userPriority)
                     const data = await response.json();
                     if (Array.isArray(data)) {
                         setRecommendedSlots(data);

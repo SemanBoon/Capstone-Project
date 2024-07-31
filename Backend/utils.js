@@ -1,13 +1,5 @@
 const getUpdatedWeights = (priority) => {
     switch (priority) {
-        default:
-            return {
-                user_preferences: 0.15,
-                preferred_time_of_day: 0.25,
-                time_slot_popularity: 0.1,
-                current_time_proximity: 0.2,
-                focus_periods: 0.3,
-            };
         case 'focus_block':
             return {
                 user_preferences: 0.2,
@@ -31,6 +23,14 @@ const getUpdatedWeights = (priority) => {
                 time_slot_popularity: 0.4, // Popular slots get the highest weight
                 current_time_proximity: 0.2,
                 focus_periods: 0.2,
+            };
+        default:
+            return {
+                user_preferences: 0.15,
+                preferred_time_of_day: 0.25,
+                time_slot_popularity: 0.1,
+                current_time_proximity: 0.2,
+                focus_periods: 0.3,
             };
     }
 };

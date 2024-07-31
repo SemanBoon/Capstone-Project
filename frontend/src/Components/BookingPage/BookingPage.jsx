@@ -43,9 +43,14 @@ const BookingPage = () => {
                         }),
                     });
                     const data = await response.json();
-                    setAvailableSlots(data);
+                    if (Array.isArray(data)) {
+                        setAvailableSlots(data);
+                    } else {
+                        setAvailableSlots([]);
+                    }
                     } catch (error) {
                     console.error('Error fetching available slots:', error);
+                    setAvailableSlots([]);
                 }
             };
 
@@ -65,9 +70,14 @@ const BookingPage = () => {
                         }),
                     });
                     const data = await response.json();
-                    setRecommendedSlots(data);
+                    if (Array.isArray(data)) {
+                        setRecommendedSlots(data);
+                    } else {
+                        setRecommendedSlots([]);
+                    }
                 } catch (error) {
                     console.error('Error fetching recommended slots:', error);
+                    setRecommendedSlots([]);
                 }
             };
             fetchAvailableSlots();
@@ -132,7 +142,8 @@ const BookingPage = () => {
         });
     };
 
-    const filteredSlots = filterSlots(availableSlots);
+    const filteredAvailableSlots = filterSlots(availableSlots);
+    const filteredRecommendedSlots = filterSlots(recommendedSlots);
 
     const handleSlotClick = (slot) => {
         setDate(slot.date);
@@ -158,9 +169,10 @@ const BookingPage = () => {
             <div className="form-group">
                 <label htmlFor="priority">What is your biggest priority in finding a booking slot:</label>
                 <select id="priority" value={userPriority} onChange={(e) => setUserPriority(e.target.value)}>
-                    <option value="focus_block">Focus Block</option>
-                    <option value="user_preferred_time">User Preferred Time</option>
-                    <option value="popular_slots">Popular Slots</option>
+                    <option value="">Select your greatest preference..</option>
+                    <option value="focus_block">Immediately after or before another appointment?</option>
+                    <option value="user_preferred_time">Past Booking Trend?</option>
+                    <option value="popular_slots">Popular Times for Service Provider?</option>
                 </select>
             </div>
             <div className="form-group">
@@ -190,9 +202,9 @@ const BookingPage = () => {
             </div>
             <div className="recommended-slots">
                 <h2>Recommended Slots:</h2>
-                {recommendedSlots.length > 0 ? (
+                {filteredRecommendedSlots.length > 0 ? (
                     <ul>
-                        {recommendedSlots.map((slot, index) => (
+                        {filteredRecommendedSlots.map((slot, index) => (
                             <li key={index} onClick={() => handleSlotClick(slot)} style={{ cursor: 'pointer' }}>
                                 {slot.date} - {new Date(slot.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </li>
@@ -204,9 +216,9 @@ const BookingPage = () => {
             </div>
             <div className="available-slots">
                 <h2>Available Slots:</h2>
-                {filteredSlots.length > 0 ? (
+                {filteredAvailableSlots.length > 0 ? (
                     <ul>
-                        {filteredSlots.map((slot, index) => (
+                        {filteredAvailableSlots.map((slot, index) => (
                             <li key={index} onClick={() => handleSlotClick(slot)} style={{ cursor: 'pointer' }}>
                                 {slot.date} - {new Date(slot.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </li>

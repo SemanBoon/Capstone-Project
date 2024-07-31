@@ -20,9 +20,6 @@ import "./App.css";
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-
-
 function App() {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");

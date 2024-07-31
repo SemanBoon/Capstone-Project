@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../../UserContext';
 import { useNavigate } from 'react-router-dom';
 
-
 const UserFavPage = () => {
     const [favorites, setFavorites] = useState([]);
     const { user } = useContext(UserContext);

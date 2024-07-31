@@ -1,4 +1,4 @@
-const { getAvailableSlots } = require('./utils.js');
+const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, calculateUtility } = require('./utils.js');
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const http = require('http');
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5174;
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const PROXIMITY_RADIUS = 16093.4;
+const PROXIMITY_RADIUS = 16093.4; //10 miles in meters
 const clients = new Map();
 
 
@@ -656,7 +656,6 @@ app.post('/get-recommended-slots', async (req, res) => {
     const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, slotPopularity);
     const weights = getUpdatedWeights(userPriority);
     const recommendedSlots = getRecommendedSlots(availableSlots, userPreferences, provider, userTime || new Date(), serviceDuration, preferredPeriod, weights);
-
     res.status(200).json(recommendedSlots);
     } catch (error) {
     console.error('Error fetching recommended slots:', error);

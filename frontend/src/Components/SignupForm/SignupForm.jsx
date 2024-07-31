@@ -66,8 +66,8 @@ const SignupForm = () => {
     }
     const phonePattern = /^\d{10}$|^\d{3}-\d{3}-\d{4}$/;
     if (!phonePattern.test(userPhone)) {
-        setErrorMessage("Please enter a valid phone number.");
-        return;
+      setErrorMessage("Please enter a valid phone number.");
+      return;
     }
 
     const formattedName = capitalizedName(userName);
@@ -121,9 +121,9 @@ const SignupForm = () => {
       } else {
         const errorData = await signupResponse.json();
         if (errorData.error === "Email already in use"){
-            setErrorMessage("Email already in use")
+          setErrorMessage("Email already in use")
         } else {
-            setErrorMessage("Signup Failed");
+          setErrorMessage("Signup Failed");
         }
       }
     } catch (error) {

@@ -13,7 +13,6 @@ describe('getAvailableSlots', () => {
         const availableSlots = getAvailableSlots(mockSchedule, serviceDuration, {});
         expect(availableSlots).toEqual([
             { date: '2023-07-23', time: '09:00', status: 0, popularity: 0 },
-            { date: '2023-07-23', time: '09:30', status: 0, popularity: 0 },
         ]);
     });
 

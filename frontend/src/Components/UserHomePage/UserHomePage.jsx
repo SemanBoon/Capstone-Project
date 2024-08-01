@@ -55,21 +55,13 @@ const UserHomePage = () => {
       </div>
       <div className = "home-container">
       <div className="category-section braid-section" onClick={() => handleCategoryClick('Braids')}>
-          <div className="tooltip">Discover beautiful braids styles</div>
-          BRAIDS
-        </div>
-        <div className="category-section haircut-section" onClick={() => handleCategoryClick('Haircuts')}>
-          <div className="tooltip">Explore stylish haircuts</div>
-          HAIRCUTS
-        </div>
-        <div className="category-section weave-section" onClick={() => handleCategoryClick('Weave and Installs')}>
-          <div className="tooltip">Find the perfect wig installs</div>
-          WIG INSTALLS
-        </div>
-        <div className="category-section locs-section" onClick={() => handleCategoryClick('Locs')}>
-          <div className="tooltip">Get the best locs styles</div>
-          LOCS
-        </div>
+        <div className="tooltip">Discover beautiful braids styles</div> BRAIDS</div>
+      <div className="category-section haircut-section" onClick={() => handleCategoryClick('Haircuts')}>
+        <div className="tooltip">Explore stylish haircuts</div>HAIRCUTS</div>
+      <div className="category-section weave-section" onClick={() => handleCategoryClick('Weave and Installs')}>
+        <div className="tooltip">Find the perfect wig installs</div>WIG INSTALLS</div>
+      <div className="category-section locs-section" onClick={() => handleCategoryClick('Locs')}>
+        <div className="tooltip">Get the best locs styles</div>LOCS</div>
       </div>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
       <section>

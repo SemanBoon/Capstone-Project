@@ -67,44 +67,43 @@ const SearchPage = () => {
 
   return (
     <div className="user-search-page">
-       <button onClick={handleBack} className="searchpage-back-button">Back</button>
+      <button onClick={handleBack} className="searchpage-back-button">Back</button>
         <h1 className="search-title">Search {category}</h1>
         <div className = "user-search-container">
-            <input
-              type="text"
-              value={location}
-              onChange={handleLocationChange}
-              placeholder="Enter city, state, or zip code"
-              className='search-input'
-            />
+          <input
+            type="text"
+            value={location}
+            onChange={handleLocationChange}
+            placeholder="Enter city, state, or zip code"
+            className='search-input'
+          />
           <div className="search-button-container">
-          <button onClick={handleSearch} className='search-button'>Search</button>
-          <button onClick={handleClear} className="clear-button">Clear</button>
+            <button onClick={handleSearch} className='search-button'>Search</button>
+            <button onClick={handleClear} className="clear-button">Clear</button>
           </div>
         </div>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
         <div className="service-provider-list">
-            {hasSearched && serviceProviders.length === 0 ? (
-              <p>No service provider found, try entering a different location</p>
-        ) : (
-          serviceProviders.map((provider) => (
-            <div key={provider.id} className="service-provider-card" onClick={() => handleProviderClick(provider)}>
-              <h3>{provider.businessName}</h3>
-              <p>{provider.bio}</p>
-              <p>Distance: {provider.distance} meters</p>
-            </div>
-          ))
+          {hasSearched && serviceProviders.length === 0 ? ( <p>No service provider found, try entering a different location</p>):
+            (serviceProviders.map((provider) => (
+              <div key={provider.id} className="service-provider-card" onClick={() => handleProviderClick(provider)}>
+                <h3>{provider.businessName}</h3>
+                <p>{provider.bio}</p>
+                <p>Distance: {provider.distance} meters</p>
+              </div>
+            ))
+          )}
+        </div>
+        {selectedProvider && (
+          <ServiceProviderModal
+            show={!!selectedProvider}
+            handleClose={handleCloseModal}
+            provider={selectedProvider}
+          />
         )}
-      </div>
-      {selectedProvider && (
-        <ServiceProviderModal
-          show={!!selectedProvider}
-          handleClose={handleCloseModal}
-          provider={selectedProvider}
-        />
-      )}
     </div>
-  );
+  )
 };
+
 
 export default SearchPage;

@@ -110,7 +110,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         <br />
         <br />
         <label htmlFor="businessAddress">Business Address:</label>
-       <AddressLookupComponent onSelect={handleAddressSelect} />
+        <AddressLookupComponent onSelect={handleAddressSelect} />
         <br />
         <br />
         <label htmlFor="priceRange">Price Range:</label>
@@ -123,8 +123,8 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
-       <br />
-       <br />
+        <br />
+        <br />
         <label htmlFor="bio">Short Bio:</label>
         <textarea
           id="bio"
@@ -134,16 +134,16 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
-       <br />
-       <br />
-       <label htmlFor="services">Services:</label>
+        <br />
+        <br />
+        <label htmlFor="services">Services:</label>
         <select
           id="services"
           name="services"
           value={formData.services}
           onChange={handleChange}
           required
-        >
+          >
           <option value="">Select a Service</option>
           <option value="braids">Braids</option>
           <option value="haircuts">Haircuts</option>
@@ -154,7 +154,6 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         <br />
         <button className="signup-button" onClick={handleSignup}>Sign Up</button>
         <button className="back-button" onClick={handleBack}>Back</button>
-
         {errorMessage && (<p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>)}
       </div>
     </div>

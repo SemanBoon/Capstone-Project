@@ -38,7 +38,7 @@ const getUpdatedWeights = (priority) => {
 const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
     const availableSlots = [];
     const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
-    
+
     for (const date in schedule) {
         const { slots, status } = schedule[date];
 
@@ -54,10 +54,16 @@ const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
             }
         }
     }
+    if (availableSlots.length === 0) {
+        return [];
+    }
     return availableSlots;
 };
 
 const getRecommendedSlots = (slots, userPreferences, provider, currentTime, serviceDuration, preferredPeriod, weights) => {
+    if (slots.length === 0) {
+        return [];
+    }
     return slots.map(slot => ({
         ...slot,
         score: calculateUtility(slot, userPreferences, provider, currentTime, weights, serviceDuration, preferredPeriod)
@@ -75,11 +81,15 @@ const calculateUserPreferences = (bookings) => {
             timeCount[slotTime] = 1;
         }
     });
-
     // Sort times by frequency
-    const sortedTimes = Object.keys(timeCount).sort((a, b) => timeCount[b] - timeCount[a]);
-
-    // Assume the top 3 most booked times are preferred times
+    const sortedTimes = Object.keys(timeCount).sort((a, b) => {
+        const frequencyDiff = timeCount[b] - timeCount[a];
+        if (frequencyDiff !== 0) {
+            return frequencyDiff;
+        }
+        // If frequencies are equal, sort by time in ascending order
+        return new Date(`1970-01-01T${a}:00Z`) - new Date(`1970-01-01T${b}:00Z`);
+    });
     return sortedTimes.slice(0, 3);
 };
 
@@ -92,6 +102,9 @@ const categorizeAppointmentTime = (time) => {
 };
 
 const calculatePreferredTimeFromAppointments = (appointments) => {
+    if (appointments.length === 0) {
+        return 'afternoon';
+    }
     const timeCounts = { morning: 0, afternoon: 0, evening: 0 };
 
     appointments.forEach((appointment) => {
@@ -153,8 +166,6 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
         return 0;
     };
 
-    //higher the proximity score, closer slot is to current time
-
     const calculateProximityScore = (slot, userTime) => {
         if (!userTime) return 0; // If user didn't enter a time, return 0
 
@@ -199,4 +210,5 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
     );
 };
 
-module.exports = { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights}
+module.exports = {calculateUtility, getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, categorizeAppointmentTime }
+

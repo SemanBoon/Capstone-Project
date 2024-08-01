@@ -624,7 +624,6 @@ app.post('/get-available-slots', async (req, res) => {
     if (userDate < today) {
       return res.status(400).json({ error: 'Please enter a valid date' });
     }
-    console.log("compare:", userDate < today)
     const provider = await prisma.serviceProvider.findUnique({
       where: { id: providerId },
       select: { schedule: true },

@@ -80,7 +80,7 @@ model Service {
   price             Float
   serviceProviderId String
   serviceProvider   serviceProvider @relation(fields: [serviceProviderId], references: [id])
-  duration          Int
+  duration          Float
 }
 
 model Favorite {

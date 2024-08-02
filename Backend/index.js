@@ -1,4 +1,3 @@
-
 const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
@@ -243,7 +242,6 @@ const getGeocode = async (address) => {
     throw new Error('Error fetching geocode');
   }
 }
-
 
 app.post('/api/search', async (req, res) => {
   const { address, category } = req.body;
@@ -512,7 +510,7 @@ app.post('/add-service', async (req, res) => {
         name,
         description,
         price: parseFloat(price),
-        duration: parseInt(duration),
+        duration: parseFloat(duration),
         serviceProviderId
       }
     });
@@ -545,8 +543,9 @@ app.put('/update-services', async (req, res) => {
     data: {
       name,
       description,
-      price,
-      duration,
+      price: parseFloat(price),
+      duration: parseFloat(duration),
+      serviceProviderId
     }
   });
   res.status(200).json(updatedServices);
@@ -618,20 +617,25 @@ app.post('/check-favorite', async (req, res) => {
 });
 
 app.post('/get-available-slots', async (req, res) => {
-  const { providerId, serviceDuration } = req.body;
+  const { providerId, serviceDuration, userDate } = req.body;
   try {
-      const provider = await prisma.serviceProvider.findUnique({
-        where: { id: providerId },
-        select: { schedule: true },
-      });
-      if (!provider) {
-        return res.status(404).json({ error: 'Service provider not found' });
-      }
-      const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {}); // Slot popularity passed as {}
-      res.status(200).json(availableSlots);
-      } catch (error) {
-      console.error('Error fetching available slots:', error);
-      res.status(500).json({ error: 'Failed to fetch available slots' });
+    const today = new Date();
+
+    if (userDate < today) {
+      return res.status(400).json({ error: 'Please enter a valid date' });
+    }
+    const provider = await prisma.serviceProvider.findUnique({
+      where: { id: providerId },
+      select: { schedule: true },
+    });
+    if (!provider) {
+      return res.status(404).json({ error: 'Service provider not found' });
+    }
+    const availableSlots = getAvailableSlots(provider.schedule, serviceDuration, {}); // Slot popularity passed as {}
+    res.status(200).json(availableSlots);
+    } catch (error) {
+    console.error('Error fetching available slots:', error);
+    res.status(500).json({ error: 'Failed to fetch available slots' });
   }
 });
 
@@ -647,7 +651,7 @@ app.post('/get-recommended-slots', async (req, res) => {
 
     let userPreferences = [];
     if (user.appointments.length > 0) {
-       userPreferences = calculateUserPreferences(user.appointments);
+      userPreferences = calculateUserPreferences(user.appointments);
     } else {
       userPreferences = ['09:00', '12:00', '15:00']; // Hard coded default preferred times for new suers
     }

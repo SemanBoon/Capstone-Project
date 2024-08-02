@@ -36,6 +36,9 @@ const getUpdatedWeights = (priority) => {
 };
 
 const getAvailableSlots = (schedule, serviceDuration, slotPopularity) => {
+    if (serviceDuration === 0 ) {
+        return []
+    }
     const availableSlots = [];
     const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
 
@@ -134,9 +137,9 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
         const status = dateSchedule.status;
         const slotIndex = slots.findIndex(s => new Date(s).toTimeString().slice(0, 5) === new Date(slot.time).toTimeString().slice(0, 5));
 
-        if (slotIndex === -1 || status[slotIndex] !== 0)
+        if (slotIndex === -1 || status[slotIndex] !== 0){
             return 0;
-
+        }
         const requiredSlots = Math.ceil(serviceDuration * 60 / 30);
 
         for (let i = 0; i < requiredSlots; i++) {
@@ -189,8 +192,6 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
         return 1 - (timeDiff / maxTimeDiff);
     };
 
-
-
     const calculatePopularityScore = (slot) => {
         return 1 - slot.popularity;
     };
@@ -211,4 +212,3 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
 };
 
 module.exports = {calculateUtility, getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, categorizeAppointmentTime }
-

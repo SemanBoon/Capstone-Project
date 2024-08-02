@@ -11,6 +11,7 @@ const BookingPage = () => {
     const [services, setServices] = useState([]);
     const [selectedService, setSelectedService] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
+    const [errorMessage, setErrorMessage] = useState("")
     const [recommendedSlots, setRecommendedSlots] = useState([])
     const [userPriority, setUserPriority] = useState(''); // New state for user priority
     const navigate = useNavigate();
@@ -40,15 +41,20 @@ const BookingPage = () => {
                         body: JSON.stringify({
                             providerId,
                             serviceDuration: selectedService.duration,
+                            userDate: date,
                         }),
                     });
                     const data = await response.json();
-                    if (Array.isArray(data)) {
+                    if (response.status === 400) {
+                        setErrorMessage("please enter a valid date"); // Set error message from the response
+                        setAvailableSlots([]); // Clear available slots
+                    } else if (Array.isArray(data)) {
                         setAvailableSlots(data);
+                        setErrorMessage(''); // Clear error message
                     } else {
                         setAvailableSlots([]);
                     }
-                    } catch (error) {
+                } catch (error) {
                     console.error('Error fetching available slots:', error);
                     setAvailableSlots([]);
                 }
@@ -83,7 +89,7 @@ const BookingPage = () => {
             fetchAvailableSlots();
             fetchRecommendedSlots();
         }
-    }, [selectedService, providerId, user.id, userPriority, time]);
+    }, [selectedService, providerId, user.id, userPriority, time, date]);
 
 
     const handleBookAppointment = async () => {
@@ -115,7 +121,7 @@ const BookingPage = () => {
     const filterSlots = (slots) => {
         if (!selectedService|| !Array.isArray(slots))
             return []
-        const requiredSlots = Math.ceil(selectedService.duration  / 30);
+        const requiredSlots = Math.ceil(selectedService.duration / 30);
         return slots.filter(slot => {
             if (date && slot.date !== date)
                 return false;
@@ -184,6 +190,7 @@ const BookingPage = () => {
                     placeholder="Select date"
                 />
             </div>
+            {errorMessage && <p style={{color: "red", fontSize: "13px"}}>{errorMessage}</p>}
             <div className="form-group">
                 <label htmlFor="time">Enter a time in HH:MM (optional):</label>
                 <input

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const ServicesPage = () => {
     const { id } = useParams();
     const [services, setServices] = useState([]);
-    const [newService, setNewService] = useState({ name: '', description: '', price: 0.0, duration: 0 });
+    const [newService, setNewService] = useState({ name: '', description: '', price: 0.0, duration: 0.0 });
     const [showForm, setShowForm] = useState(false);
     const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ const ServicesPage = () => {
             }
             const data = await response.json();
                 setServices([...services, data]);
-                setNewService({ name: '', description: '', price: 0.0, duration: 0 });
+                setNewService({ name: '', description: '', price: 0.0, duration: 0.0 });
                 setShowForm(false);
         } catch (error) {
             console.error(error);
@@ -73,24 +73,29 @@ const ServicesPage = () => {
                         value={newService.name}
                         onChange={(e) => setNewService({ ...newService, name: e.target.value })}
                         placeholder="Service Name"
+                        className="service-name"
                     />
                     <input
                         type="text"
                         value={newService.description}
                         onChange={(e) => setNewService({ ...newService, description: e.target.value })}
                         placeholder="Service Description"
+                        className="service-description"
                     />
                     <input
                         type="text"
                         value={newService.price}
                         onChange={(e) => setNewService({...newService, price: e.target.value})}
                         placeholder="Service Price"
+                        className="service-price"
+
                     />
                     <input
                         type="text"
                         value={newService.duration}
-                        onChange={(e) => setNewService({...newService, duration: e.target.value})}
+                        onChange={(e) => setNewService({...newService, duration: parseFloat(e.target.value)})}
                         placeholder="How long will this service take"
+                        className="service-length"
                     />
                     <button onClick={handleAddService}>Add Service</button>
                     <button onClick={() => setShowForm(false)}>Cancel</button>

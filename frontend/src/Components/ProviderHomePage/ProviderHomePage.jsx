@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ProviderNavBar from "../ProviderNavBar/ProviderNavBar";
 import ScheduleModal from "../ScheduleModal/ScheduleModal";
 import "./ProviderHomePage.css";
@@ -15,14 +15,14 @@ const ProviderHomePage = () => {
     const [scheduleDate, setScheduleDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchAppointments();
         fetchProfile();
         fetchServices();
         fetchSchedules();
-    }, []);
+        fetchMediaFiles();
+    }, [id]);
 
     const fetchAppointments = async () => {
         try {
@@ -33,7 +33,7 @@ const ProviderHomePage = () => {
                 const data = await response.json();
                 setAppointments(data);
             }
-        }   catch (error) {
+        } catch (error) {
             console.error(error);
         }
     };
@@ -46,7 +46,7 @@ const ProviderHomePage = () => {
             }
             const data = await response.json();
             setProfile(data);
-        }   catch (error) {
+        } catch (error) {
             console.error(error);
         }
     };
@@ -59,7 +59,7 @@ const ProviderHomePage = () => {
             }
             const data = await response.json();
             setServices(data);
-        }   catch (error) {
+        } catch (error) {
             console.error(error);
         }
     };
@@ -77,11 +77,24 @@ const ProviderHomePage = () => {
         }
     };
 
+    const fetchMediaFiles = async () => {
+        try {
+            const response = await fetch(`http://localhost:5174/media-files/${id}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch media files');
+            }
+            const data = await response.json();
+            setMedia(data);
+        } catch (error) {
+            console.error('Error fetching media files:', error);
+        }
+    };
+
     const handleUpload = async (file) => {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            const response = await fetch(`http://localhost:5174/upload-media`, {
+            const response = await fetch(`http://localhost:5174/upload-media/${id}`, {
                 method: "POST",
                 body: formData,
             });
@@ -90,7 +103,7 @@ const ProviderHomePage = () => {
             }
             const data = await response.json();
             setMedia([...media, data]);
-            } catch (error) {
+        } catch (error) {
             console.error(error);
         }
     };
@@ -119,10 +132,6 @@ const ProviderHomePage = () => {
         }
     };
 
-    const handleProfileUpdate = () => {
-        navigate(`/service-provider-profile/${id}`);
-    };
-
     return (
         <div className="service-provider-homepage">
             <ProviderNavBar id={id}/>
@@ -130,7 +139,6 @@ const ProviderHomePage = () => {
             <section>
                 <h2>Your Bio</h2>
                 <p>{profile.bio}</p>
-                <button onClick={handleProfileUpdate}>Edit Bio</button>
             </section>
             <section>
                 <h2>Your Schedules</h2>
@@ -196,16 +204,32 @@ const ProviderHomePage = () => {
                 <h2>Upload Pictures and Videos of Your Work</h2>
                 <input type="file" onChange={(e) => handleUpload(e.target.files[0])} />
                 <div className="media-gallery">
-                    {media.length > 0 ? (media.map((item, index) => (
-                        <div key={index}>
-                            {item.type === 'image' ? (
-                                <img src={item.url} alt="Uploaded work" />
-                            ) : (
-                                <video src={item.url} controls />
-                            )}
-                        </div>
-                    ))) : ( <p>You have no media files.</p>)
-                    }
+                    <div className="media-title">Photos</div>
+                    <div className="media-section">
+                        {media.filter(item => item.mimeType.startsWith('image/')).length > 0 ? (
+                            media
+                                .filter(item => item.mimeType.startsWith('image/'))
+                                .map((item, index) => (
+                                    <div key={index} className="media-item">
+                                        <img src={`http://localhost:5174/media-files/file/${item.filename}`} alt={item.originalName} />
+                                    </div>
+                                ))
+                            ):(<p>No photos available. Please upload photos of your work.</p>
+                        )}
+                    </div>
+                    <div className="media-title">Videos</div>
+                    <div className="media-section">
+                    {media.filter(item => item.mimeType.startsWith('video/')).length > 0 ? (
+                            media
+                                .filter(item => item.mimeType.startsWith('video/'))
+                                .map((item, index) => (
+                                    <div key={index} className="media-item">
+                                        <video src={`http://localhost:5174/media-files/file/${item.filename}`} controls />
+                                    </div>
+                                ))
+                            ):(<p>No videos available. Please upload videos of your work.</p>
+                        )}
+                    </div>
                 </div>
             </section>
             <section>

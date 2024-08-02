@@ -6,6 +6,7 @@ const WebSocket = require('ws');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const multer = require('multer');
+const path = require('path');
 require('dotenv').config();
 const app = express();
 app.use(express.json());
@@ -13,12 +14,15 @@ const prisma = new PrismaClient();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT || 5174;
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
+const UPLOAD_DIR = './media';
 const PROXIMITY_RADIUS = 16093.4; //10 miles in meters
 const clients = new Map();
 
+
+const upload = multer({ storage });
+
+let mediaFiles = [];
 
 server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`); //this concole.log is essential because it shows me that the backend is running and that it's running on the right port.
@@ -29,6 +33,44 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Upload photos and videos of service provider
+app.post('/upload-media/:providerId', upload.single('file'), (req, res) => {
+  const providerId = req.params.providerId;
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const fileData = {
+    id: Date.now(),
+    providerId: providerId,
+    filename: req.file.filename,
+    path: req.file.path,
+    mimeType: req.file.mimetype,
+    originalName: req.file.originalname,
+  };
+
+  mediaFiles.push(fileData);
+  res.status(200).json(fileData);
+});
+
+app.get('/media-files/:providerId', (req, res) => {
+  const providerId = req.params.providerId;
+  const providerMedia = mediaFiles.filter(file => file.providerId === providerId);
+  res.status(200).json(providerMedia);
+});
+
+app.get('/media-files/file/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const file = mediaFiles.find(f => f.filename === filename);
+
+  if (!file) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+
+  res.set('Content-Type', file.mimeType);
+  res.sendFile(path.resolve(file.path));
+});
 
 app.get("/", (req, res) => {
   res.send("Initial Selection Page");
@@ -144,7 +186,7 @@ app.post("/user-signup", async (req, res) => {
   }
 });
 
-app.post("/service-provider-signup", upload.single("profilePhoto"), async (req, res) => {
+app.post("/service-provider-signup", async (req, res) => {
   const { businessName, email, phoneNumber, password, businessAddress, priceRange, bio, services } = req.body;
   try {
     const existingUser = await prisma.serviceProvider.findFirst({
@@ -169,7 +211,6 @@ app.post("/service-provider-signup", upload.single("profilePhoto"), async (req, 
         priceRange,
         bio,
         services,
-        profilePhoto: req.file ? req.file.buffer : null,
         userType: "service-provider",
       },
     });
@@ -472,16 +513,9 @@ app.get('/service-provider-profile/:id', async (req, res) => {
   }
 });
 
-// Upload photos and videos of service provider
-app.post('/upload-media', upload.single('file'), async (req, res) => {
-  const file = req.file;
-  const url = `http://localhost:5174/uploads/${file.filename}`;
-  res.json({ url, type: file.mimetype.startsWith('image/') ? 'image' : 'video' });
-});
-
 // Update service provider profile
 app.put('/update-profile', async (req, res) => {
-  const { id, businessName, bio, businessAddress, phoneNumber, priceRange } = req.body;
+  const { email, id, businessName, bio, businessAddress, phoneNumber, priceRange } = req.body;
 
   const data = {};
   if (businessName !== undefined) data.businessName = businessName;
@@ -489,6 +523,7 @@ app.put('/update-profile', async (req, res) => {
   if (businessAddress !== undefined) data.businessAddress = businessAddress;
   if (phoneNumber !== undefined) data.phoneNumber = phoneNumber;
   if (priceRange !== undefined) data.priceRange = priceRange;
+  if (email !== undefined) data.email = email;
 
   try {
     const updatedProfile = await prisma.serviceProvider.update({
@@ -696,3 +731,4 @@ const calculateSlotPopularity = async (providerId) => {
     return {};
   }
 };
+

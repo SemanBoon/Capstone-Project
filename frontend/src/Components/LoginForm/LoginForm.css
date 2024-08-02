@@ -42,7 +42,7 @@ h2 {
 }
 
 .login-button {
-  background-color: #ff8400;
+  color: #ff5f6d;
   color: #fff;
   padding: 10px 20px;
   border: none;
@@ -52,13 +52,13 @@ h2 {
 }
 
 .login-button:hover {
-  background-color: #ff9900;
+  background-color: #e64552;
 }
 
 .new-user {
   text-decoration: none;
   margin-top: 0px;
-  color: #a64913;
+  color: #e64552;
 }
 
 .new-user:hover {

@@ -1,0 +1,51 @@
+.favpage-content {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.favpage-header h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.fav-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.fav-item {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-top: 0;
+  color: #ff5f6d;
+}
+
+p {
+  color: #555;
+  margin: 5px 0;
+}
+
+.fav-back-button {
+  padding: 10px 20px;
+  background-color: #ff5f6d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;
+  width: fit-content;
+  margin: 20px auto;
+  transition: background-color 0.3s;
+}
+
+.fav-back-button:hover {
+  background-color: #e64552;
+}

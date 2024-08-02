@@ -40,7 +40,7 @@ body, html {
   border-radius: 15px;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  color: black;
+  color: white;
   font-size: 1.2em;
   font-weight: bold;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
@@ -69,19 +69,20 @@ body, html {
 }
 
 .tooltip {
+  background-color: white;
+  border-radius: 8px;
+  color: black;
+  font-size: 0.7em;
   position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.9em;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s;
-  white-space: nowrap;
+  transition: 0.5s;
+  padding: 0.5em 1em;
+  margin-top: 0;
+  z-index: 1000;
+}
+.ex-tooltip:hover > .tooltip {
+  background-color: yellow;
+  color: black;
+  font-size: 1.2em;
 }
 
 .category-section:hover .tooltip {

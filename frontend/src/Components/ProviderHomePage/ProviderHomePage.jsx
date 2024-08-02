@@ -38,6 +38,16 @@ const ProviderHomePage = () => {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("service-provider");
+        updateUser(null);
+        navigate("/login");
+        window.history.pushState(null, "", window.location.href);
+        window.addEventListener("popstate", () => {
+          navigate("/login");
+        });
+    };
+
     const fetchProfile = async () => {
         try {
             const response = await fetch(`http://localhost:5174/service-provider-profile/${id}`);
@@ -133,9 +143,12 @@ const ProviderHomePage = () => {
     };
 
     return (
+        <>
+        <ProviderNavBar id={id}/>
         <div className="service-provider-homepage">
-            <ProviderNavBar id={id}/>
-            <h1>Welcome, {profile.businessName}</h1>
+            <div className="homepage-header">
+                <h1>Welcome, {profile.businessName}</h1>
+            </div>
             <section>
                 <h2>Your Bio</h2>
                 <p>{profile.bio}</p>
@@ -257,9 +270,11 @@ const ProviderHomePage = () => {
                     </table>
                 ) : (<p>You have no services available.</p>)}
             </section>
+            <button onClick={handleLogout} className="logout-button">Log Out</button>
+
         </div>
+        </>
     );
 };
 
 export default ProviderHomePage;
-

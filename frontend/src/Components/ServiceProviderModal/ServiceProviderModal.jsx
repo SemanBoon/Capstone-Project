@@ -2,6 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../UserContext';
+import "./ServiceProviderModal.css";
 import {
   APIProvider,
   Map,
@@ -123,23 +124,6 @@ const ServiceProviderModal = ({ show, handleClose, provider }) => {
                 <p>No media available</p>
             )}
             </div>
-            <div style={{ width: '100%', height: '400px' }}>
-                <APIProvider apiKey={apiKey}>
-                    <Map
-                        center={center}
-                        zoom={15}
-                        mapId= 'b1a41b38a2b81e08'
-                        style={{ height: '100%', width: '100%' }}
-                    >
-                        <AdvancedMarker position={center}>
-                            <Pin scale={2} />
-                            <InfoWindow>
-                                <div>{provider.businessName}</div>
-                            </InfoWindow>
-                        </AdvancedMarker>
-                    </Map>
-                </APIProvider>
-            </div>
             <h3>Services</h3>
             {services.length > 0 ? (
                 <table>
@@ -163,6 +147,23 @@ const ServiceProviderModal = ({ show, handleClose, provider }) => {
             ) : (
             <p>No services available</p>
             )}
+            <div style={{ width: '110%', height: '400px' }}>
+                <APIProvider apiKey={apiKey}>
+                    <Map
+                        center={center}
+                        zoom={15}
+                        mapId= 'b1a41b38a2b81e08'
+                        style={{ height: '100%', width: '100%' }}
+                    >
+                        <AdvancedMarker position={center}>
+                            <Pin scale={2} />
+                            <InfoWindow>
+                                <div>{provider.businessName}</div>
+                            </InfoWindow>
+                        </AdvancedMarker>
+                    </Map>
+                </APIProvider>
+            </div>
         </Modal.Body>
         <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>Close</Button>

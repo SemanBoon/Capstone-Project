@@ -1,8 +1,10 @@
 const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
+const { handleUpgrade, notifyUsersInArea, sendNotification } = require('./websocket.js')
+const { getGeocode } = require('./address-lookup.js')
+
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const multer = require('multer');
@@ -12,13 +14,18 @@ const app = express();
 app.use(express.json());
 const prisma = new PrismaClient();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT || 5174;
 
 const UPLOAD_DIR = './media';
-const PROXIMITY_RADIUS = 16093.4; //10 miles in meters
-const clients = new Map();
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+  },
+});
 
 const upload = multer({ storage });
 
@@ -88,79 +95,7 @@ app.get("/homepage", (req, res) => {
   res.send(`Welcome to the app`);
 });
 
-
-wss.on('connection', async (ws, request) => {
-  const userId = request.url.split('/').pop();
-  clients.set(userId, ws);
-
-  // Deliver undelivered notifications
-  const undeliveredNotifications = await prisma.notification.findMany({
-    where: { userId: userId, delivered: false },
-  });
-
-  undeliveredNotifications.forEach(async (notification) => {
-    ws.send(JSON.stringify({ message: notification.message }));
-    await prisma.notification.update({
-      where: { id: notification.id },
-      data: { delivered: true },
-    });
-  });
-
-  ws.on('close', () => {
-    clients.delete(userId);
-  });
-
-  ws.on('error', (error) => {
-    console.error(`WebSocket error for user ${userId}: ${error.message}`, error);
-    clients.delete(userId);
-  });
-});
-
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
-  });
-});
-
-const sendNotification = async (userId, message) => {
-  const client = clients.get(userId);
-  if (client && client.readyState === WebSocket.OPEN) {
-    client.send(JSON.stringify({ message }));
-  } else {
-    await prisma.notification.create({
-      data:{
-        userId,
-        message,
-        delivered: client && client.readyState === WebSocket.OPEN
-      },
-    });
-  }
-};
-
-const notifyUsersInArea = async (newProvider) => {
-  try {
-    const newProviderLocation = await getGeocode(newProvider.businessAddress);
-    const users = await prisma.user.findMany();
-    for (const user of users) {
-      try {
-        const userLocation = await getGeocode(user.userAddress);
-        const distance = Math.sqrt(
-          Math.pow(newProviderLocation.x - userLocation.x, 2) +
-          Math.pow(newProviderLocation.y - userLocation.y, 2)
-        );
-        if (distance <= PROXIMITY_RADIUS) {
-          const notificationMessage = `A new gem, ${newProvider.businessName}, was just discovered in your area!`;
-          await sendNotification(user.id, notificationMessage);
-        }
-      } catch (userError) {
-        console.error(`Error processing user ${user.id}: ${userError.message}`);
-      }
-    }
-  } catch (error) {
-    console.error(`Error in notifyUsersInArea: ${error.message}`);
-  }
-};
-
+handleUpgrade(server);
 
 app.post("/user-signup", async (req, res) => {
   const { name, email, phoneNumber, password, userAddress } = req.body;
@@ -185,8 +120,7 @@ app.post("/user-signup", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-app.post("/service-provider-signup", async (req, res) => {
+app.post("/service-provider-signup", upload.single("profilePhoto"), async (req, res) => {
   const { businessName, email, phoneNumber, password, businessAddress, priceRange, bio, services } = req.body;
   try {
     const existingUser = await prisma.serviceProvider.findFirst({
@@ -211,6 +145,7 @@ app.post("/service-provider-signup", async (req, res) => {
         priceRange,
         bio,
         services,
+        profilePhoto: req.file ? req.file.buffer : null,
         userType: "service-provider",
       },
     });
@@ -221,6 +156,7 @@ app.post("/service-provider-signup", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -264,25 +200,6 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-const getGeocode = async (address) => {
-  try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-    const data = await response.json();
-    if (data.length === 0) {
-      console.error(`No geocode candidates found for address: ${address}`);
-      throw new Error('Invalid address');
-    }
-    const location = {
-      x: parseFloat(data[0].lon),
-      y: parseFloat(data[0].lat)
-    };
-    return location;
-  } catch (error) {
-    console.error(`Error fetching geocode for address ${address}: ${error.message}`);
-    throw new Error('Error fetching geocode');
-  }
-}
 
 app.post('/api/search', async (req, res) => {
   const { address, category } = req.body;
@@ -702,33 +619,3 @@ app.post('/get-recommended-slots', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch recommended slots' });
   }
 });
-
-const calculateSlotPopularity = async (providerId) => {
-  try {
-      const bookings = await prisma.appointment.findMany({
-        where: { serviceProviderId: providerId },
-      });
-
-      const slotCount = {};
-      const totalBookings = bookings.length;
-
-      bookings.forEach(booking => {
-        const slotTime = booking.time;
-      if (slotCount[slotTime]) {
-        slotCount[slotTime]++;
-      } else {
-        slotCount[slotTime] = 1;
-      }
-    });
-
-    const slotPopularity = {};
-    Object.keys(slotCount).forEach(slotTime => {
-      slotPopularity[slotTime] = slotCount[slotTime] / totalBookings;
-    });
-    return slotPopularity;
-  } catch (error) {
-    console.error('Error calculating slot popularity:', error);
-    return {};
-  }
-};
-

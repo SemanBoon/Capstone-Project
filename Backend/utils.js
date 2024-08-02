@@ -1,3 +1,6 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const getUpdatedWeights = (priority) => {
     switch (priority) {
         case 'focus_block':
@@ -211,4 +214,35 @@ const calculateUtility = (slot, userPreference, provider, currentTime, weights, 
     );
 };
 
-module.exports = {calculateUtility, getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, categorizeAppointmentTime }
+
+const calculateSlotPopularity = async (providerId) => {
+    try {
+        const bookings = await prisma.appointment.findMany({
+          where: { serviceProviderId: providerId },
+        });
+
+        const slotCount = {};
+        const totalBookings = bookings.length;
+
+        bookings.forEach(booking => {
+          const slotTime = booking.time;
+        if (slotCount[slotTime]) {
+          slotCount[slotTime]++;
+        } else {
+          slotCount[slotTime] = 1;
+        }
+      });
+
+      const slotPopularity = {};
+      Object.keys(slotCount).forEach(slotTime => {
+        slotPopularity[slotTime] = slotCount[slotTime] / totalBookings;
+      });
+      return slotPopularity;
+    } catch (error) {
+      console.error('Error calculating slot popularity:', error);
+      return {};
+    }
+  };
+
+
+module.exports = {calculateSlotPopularity, calculateUtility, getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights, categorizeAppointmentTime }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../../UserContext';
 import { useNavigate } from 'react-router-dom';
+import "./UserFavPage.css";
+
 
 const UserFavPage = () => {
     const [favorites, setFavorites] = useState([]);
@@ -29,12 +31,12 @@ const UserFavPage = () => {
     }
 
     return (
-        <div>
-            <h1>Favorite Service Providers</h1>
+        <div className = "favpage-content">
+            <h1 className="favpage-header">Favorite Service Providers</h1>
             {favorites.length > 0 ? (
-                <ul>
+                <ul className="fav-list">
                     {favorites.map(fav => (
-                        <li key={fav.id}>
+                        <li className="fav-item" key={fav.id}>
                             <h2>{fav.serviceProvider.businessName}</h2>
                             <p>{fav.serviceProvider.businessAddress}</p>
                             <p>{fav.serviceProvider.phoneNumber}</p>
@@ -45,7 +47,7 @@ const UserFavPage = () => {
             ) : (
                 <p>No favorites added yet.</p>
             )}
-            <button onClick={handleBack}>Back</button>
+            <button clasName ="fav-back-button"onClick={handleBack}>Back</button>
         </div>
     );
 };

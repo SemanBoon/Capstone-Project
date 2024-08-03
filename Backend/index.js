@@ -1,4 +1,4 @@
-const { getAvailableSlots, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
+const { getAvailableSlots, calculateSlotPopularity, getRecommendedSlots, calculateUserPreferences, calculatePreferredTimeFromAppointments, getUpdatedWeights } = require('./utils.js');
 const { handleUpgrade, notifyUsersInArea, sendNotification } = require('./websocket.js')
 const { getGeocode } = require('./address-lookup.js')
 

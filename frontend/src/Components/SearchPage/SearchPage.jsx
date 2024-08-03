@@ -12,6 +12,7 @@ const SearchPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const SearchPage = () => {
   }, [category, userAddress]);
 
   const fetchServiceProviders = async (loc) => {
+    setIsLoading(true);
     try {
       const response = await fetch('http://localhost:5174/api/search', {
         method: 'POST',
@@ -32,6 +34,8 @@ const SearchPage = () => {
       setHasSearched(true);
     } catch (error) {
       setErrorMessage('Error fetching service providers');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,17 +87,23 @@ const SearchPage = () => {
           </div>
         </div>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <div className="service-provider-list">
-          {hasSearched && serviceProviders.length === 0 ? ( <p>No service provider found, try entering a different location</p>):
-            (serviceProviders.map((provider) => (
-              <div key={provider.id} className="service-provider-card" onClick={() => handleProviderClick(provider)}>
-                <h3>{provider.businessName}</h3>
-                <p>{provider.bio}</p>
-                <p>Distance: {provider.distance} meters</p>
-              </div>
-            ))
-          )}
-        </div>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="service-provider-list">
+            {hasSearched && serviceProviders.length === 0 ? (
+              <p>No service provider found, try entering a different location</p>
+            ) : (
+              serviceProviders.map((provider) => (
+                <div key={provider.id} className="service-provider-card" onClick={() => handleProviderClick(provider)}>
+                  <h3>{provider.businessName}</h3>
+                  <p>{provider.bio}</p>
+                  <p>Distance: {provider.distance} meters</p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
         {selectedProvider && (
           <ServiceProviderModal
             show={!!selectedProvider}
@@ -104,6 +114,5 @@ const SearchPage = () => {
     </div>
   )
 };
-
 
 export default SearchPage;

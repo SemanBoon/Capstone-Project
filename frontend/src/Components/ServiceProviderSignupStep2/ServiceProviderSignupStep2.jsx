@@ -12,15 +12,14 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
     bio: "",
     services: "",
   });
+
   const [initialData, setInitialData] = useState({});
   const { updateUser } = useContext(UserContext);
-  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const savedFormData = JSON.parse(
-      localStorage.getItem("serviceProviderFormData")
-    );
+    const savedFormData = JSON.parse(localStorage.getItem("serviceProviderFormData"));
     if (savedFormData) {
       setInitialData(savedFormData);
     }
@@ -55,8 +54,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
     });
 
     try {
-      const signupResponse = await fetch(
-        `${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`,
+      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/service-provider-signup`,
         {
           method: "POST",
           body: formDataToSend,
@@ -66,13 +64,9 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
       if (signupResponse.ok) {
         localStorage.removeItem("serviceProviderFormData");
 
-        const loginResponse = await fetch(
-          `${import.meta.env.VITE_BACKEND_ADDRESS}/login`,
-          {
+        const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_ADDRESS}/login`,{
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" } ,
             body: JSON.stringify({
               email: initialData.email,
               password: initialData.password,
@@ -84,7 +78,7 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           const loginData = await loginResponse.json();
           localStorage.setItem("user", JSON.stringify(loginData));
           updateUser(loginData);
-          navigate("/homepage");
+          navigate(`/provider-homepage/${loginData.id}`)
         } else {
           setErrorMessage("Login Failed");
         }
@@ -116,12 +110,10 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         <br />
         <br />
         <label htmlFor="businessAddress">Business Address:</label>
-       <AddressLookupComponent onSelect={handleAddressSelect} />
+        <AddressLookupComponent onSelect={handleAddressSelect} />
         <br />
         <br />
-
         <label htmlFor="priceRange">Price Range:</label>
-
         <input
           type="text"
           id="priceRange"
@@ -131,10 +123,9 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           onChange={handleChange}
           required
         />
-       <br />
-       <br />
+        <br />
+        <br />
         <label htmlFor="bio">Short Bio:</label>
-
         <textarea
           id="bio"
           name="bio"
@@ -144,15 +135,15 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
           required
         />
         <br />
-       <br />
-       <label htmlFor="services">Services:</label>
+        <br />
+        <label htmlFor="services">Services:</label>
         <select
           id="services"
           name="services"
           value={formData.services}
           onChange={handleChange}
           required
-        >
+          >
           <option value="">Select a Service</option>
           <option value="braids">Braids</option>
           <option value="haircuts">Haircuts</option>
@@ -161,20 +152,10 @@ const ServiceProviderSignupStep2 = ({ setStep }) => {
         </select>
         <br />
         <br />
-        <button className="signup-button" onClick={handleSignup}>
-          Sign Up
-        </button>
-
-        <button className="back-button" onClick={handleBack}>
-          Back
-        </button>
-
-        {errorMessage && (
-          <p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>
-        )}
-
+        <button className="signup-button" onClick={handleSignup}>Sign Up</button>
+        <button className="back-button" onClick={handleBack}>Back</button>
+        {errorMessage && (<p style={{ color: "red", fontSize: "13px" }}>{errorMessage}</p>)}
       </div>
-
     </div>
   );
 };
